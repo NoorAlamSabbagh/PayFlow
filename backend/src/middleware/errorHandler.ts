@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 import { AppError } from '../utils/errors';
 import { sendError } from '../utils/response';
 import { logger } from '../config/logger';
@@ -11,6 +12,14 @@ export function errorHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): Response {
+  if (err instanceof ZodError) {
+    const details = err.errors.map((e) => ({
+      field: e.path.join('.'),
+      message: e.message,
+    }));
+    return sendError(res, 'Request validation failed', 'VALIDATION_ERROR', 400, details);
+  }
+
   if (err instanceof AppError) {
     logger.warn('Operational application error', {
       path: req.path,

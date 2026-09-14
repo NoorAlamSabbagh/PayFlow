@@ -26,7 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', active: true },
     { name: 'Wallet', icon: Wallet, path: '/wallet', active: true },
     { name: 'Transfers', icon: ArrowLeftRight, path: '/transfers', active: true },
-    { name: 'Payments', icon: CreditCard, path: '#', comingSoon: 'Phase 4' },
+    { name: 'Payments', icon: CreditCard, path: '/payments', active: true },
     { name: 'Ledger Audit', icon: ReceiptText, path: '/wallet', active: true },
     { name: 'Risk & Security', icon: ShieldAlert, path: '#', comingSoon: 'Phase 6' },
   ];

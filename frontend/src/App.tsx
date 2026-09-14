@@ -8,6 +8,7 @@ import { Register } from './features/auth/Register';
 import { Dashboard } from './features/dashboard/Dashboard';
 import { WalletView } from './features/wallet/WalletView';
 import { TransferView } from './features/transfers/TransferView';
+import { PaymentsView } from './features/payment/PaymentsView';
 import { Forbidden } from './components/Forbidden';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -65,6 +66,16 @@ export const App: React.FC = () => {
           <ProtectedRoute>
             <Layout>
               <TransferView />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payments"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PaymentsView />
             </Layout>
           </ProtectedRoute>
         }

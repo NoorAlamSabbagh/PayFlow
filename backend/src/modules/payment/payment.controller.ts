@@ -5,7 +5,7 @@ import {
   listPaymentsQuerySchema,
 } from './payment.validation';
 import { sendSuccess } from '../../utils/response';
-import { BadRequestError } from '../../utils/errors';
+import { BadRequestError, UnauthorizedError } from '../../utils/errors';
 
 export class PaymentController {
   constructor(private paymentServ: PaymentService = paymentService) {}
@@ -25,7 +25,10 @@ export class PaymentController {
       }
 
       const validated = createPaymentIntentSchema.parse(req.body);
-      const userId = (req as any).user.id;
+      const userId = req.user?.userId || (req as any).user?.id;
+      if (!userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
 
       const result = await this.paymentServ.createPaymentIntent({
         userId,
@@ -48,12 +51,16 @@ export class PaymentController {
   ): Promise<void> => {
     try {
       const { paymentIntentId } = req.params;
-      const user = (req as any).user;
+      const userId = req.user?.userId || (req as any).user?.id;
+      const userRole = req.user?.role || (req as any).user?.role || 'USER';
+      if (!userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
 
       const result = await this.paymentServ.getPaymentIntent(
-        user.id,
+        userId,
         paymentIntentId,
-        user.role
+        userRole
       );
 
       sendSuccess(res, result, 'Payment intent retrieved successfully');
@@ -69,7 +76,10 @@ export class PaymentController {
   ): Promise<void> => {
     try {
       const query = listPaymentsQuerySchema.parse(req.query);
-      const userId = (req as any).user.id;
+      const userId = req.user?.userId || (req as any).user?.id;
+      if (!userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
 
       const result = await this.paymentServ.listUserPayments(userId, query);
       sendSuccess(res, result, 'User payment history retrieved successfully');
