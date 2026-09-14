@@ -10,6 +10,11 @@ import { NotFoundError } from './utils/errors';
 import { sendSuccess } from './utils/response';
 import authRoutes from './modules/auth/auth.routes';
 import userRoutes from './modules/user/user.routes';
+import walletRoutes from './modules/wallet/wallet.routes';
+import transferRoutes from './modules/transfer/transfer.routes';
+import transactionRoutes from './modules/transfer/transaction.routes';
+import paymentRoutes from './modules/payment/payment.routes';
+import webhookRoutes from './modules/webhook/webhook.routes';
 import swaggerDocument from './docs/swagger.json';
 
 export function createApp(): Express {
@@ -28,8 +33,15 @@ export function createApp(): Express {
     })
   );
 
-  // 3. Body and Cookie Parsers
-  app.use(express.json({ limit: '1mb' }));
+  // 3. Body and Cookie Parsers (Preserve rawBuffer for Webhook signature verification)
+  app.use(
+    express.json({
+      limit: '1mb',
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      },
+    })
+  );
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
   app.use(cookieParser());
 
@@ -62,6 +74,11 @@ export function createApp(): Express {
   // 7. Mount Domain API Modules
   app.use(`${config.apiPrefix}/auth`, authRoutes);
   app.use(`${config.apiPrefix}/users`, userRoutes);
+  app.use(`${config.apiPrefix}/wallets`, walletRoutes);
+  app.use(`${config.apiPrefix}/transfers`, transferRoutes);
+  app.use(`${config.apiPrefix}/transactions`, transactionRoutes);
+  app.use(`${config.apiPrefix}/payments`, paymentRoutes);
+  app.use(`${config.apiPrefix}/webhooks`, webhookRoutes);
 
   // 8. 404 Route Not Found Handler
   app.use((req: Request, _res: Response, next: NextFunction) => {

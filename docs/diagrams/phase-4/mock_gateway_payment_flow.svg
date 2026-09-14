@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p4Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#141829" />
+    </linearGradient>
+    <linearGradient id="cardP4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <marker id="mP4" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+    </marker>
+    <marker id="mP4Green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p4Bg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Phase 4 Payment Intent &amp; Gateway Redirection Lifecycle</text>
+  <text x="480" y="58" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Payment Intent Creation $\rightarrow$ Simulated Gateway Authorization $\rightarrow$ Webhook Asynchronous Settlement</text>
+
+  <!-- Actors -->
+  <rect x="70" y="85" width="110" height="36" rx="6" fill="url(#cardP4)" stroke="#38bdf8" stroke-width="1.2" />
+  <text x="125" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">User / Browser</text>
+  <line x1="125" y1="121" x2="125" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <rect x="300" y="85" width="140" height="36" rx="6" fill="url(#cardP4)" stroke="#6366f1" stroke-width="1.2" />
+  <text x="370" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#818cf8" text-anchor="middle">PayFlow API Server</text>
+  <line x1="370" y1="121" x2="370" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <rect x="550" y="85" width="150" height="36" rx="6" fill="url(#cardP4)" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="625" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#fcd34d" text-anchor="middle">Mock Payment Gateway</text>
+  <line x1="625" y1="121" x2="625" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <rect x="770" y="85" width="130" height="36" rx="6" fill="url(#cardP4)" stroke="#10b981" stroke-width="1.5" />
+  <text x="835" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#6ee7b7" text-anchor="middle">PostgreSQL Database</text>
+  <line x1="835" y1="121" x2="835" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Step 1: POST /payments/intents -->
+  <line x1="125" y1="145" x2="360" y2="145" stroke="#6366f1" stroke-width="2" marker-end="url(#mP4)" />
+  <text x="242" y="138" font-family="JetBrains Mono, monospace" font-size="9" fill="#cbd5e1" text-anchor="middle">1. POST /payments/intents { amount: 500000 }</text>
+
+  <!-- Step 2: Create Gateway Order -->
+  <line x1="370" y1="175" x2="615" y2="175" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#mP4)" />
+  <text x="492" y="168" font-family="JetBrains Mono, monospace" font-size="9" fill="#fcd34d" text-anchor="middle">2. POST /orders (amount, currency: 'INR')</text>
+
+  <!-- Step 3: Return Order ID -->
+  <line x1="625" y1="205" x2="380" y2="205" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#mP4)" />
+  <text x="502" y="198" font-family="JetBrains Mono, monospace" font-size="9" fill="#fcd34d" text-anchor="middle">3. 200 OK { gateway_order_id, checkout_url }</text>
+
+  <!-- Step 4: INSERT payment_intent (CREATED) -->
+  <line x1="370" y1="235" x2="825" y2="235" stroke="#10b981" stroke-width="1.5" marker-end="url(#mP4Green)" />
+  <text x="597" y="228" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">4. INSERT payment_intents (status='CREATED')</text>
+
+  <!-- Step 5: Return Checkout URL to User -->
+  <line x1="370" y1="265" x2="135" y2="265" stroke="#6366f1" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#mP4)" />
+  <text x="242" y="258" font-family="JetBrains Mono, monospace" font-size="9" fill="#818cf8" text-anchor="middle">5. 201 Created { checkout_url, order_id }</text>
+
+  <!-- Step 6: User Authorizes at Gateway -->
+  <line x1="125" y1="305" x2="615" y2="305" stroke="#38bdf8" stroke-width="2" marker-end="url(#mP4)" />
+  <text x="370" y="298" font-family="JetBrains Mono, monospace" font-size="9" fill="#38bdf8" text-anchor="middle">6. User Authorizes Card / UPI on Simulated Gateway Checkout</text>
+
+  <!-- Step 7: Gateway fires Webhook -->
+  <line x1="625" y1="350" x2="380" y2="350" stroke="#f59e0b" stroke-width="2" marker-end="url(#mP4)" />
+  <text x="502" y="342" font-family="JetBrains Mono, monospace" font-size="9" fill="#fcd34d" text-anchor="middle">7. POST /webhooks/gateway (HMAC Signature)</text>
+
+  <!-- Step 8: Verify Signature & Credit Ledger -->
+  <line x1="370" y1="395" x2="825" y2="395" stroke="#10b981" stroke-width="2" marker-end="url(#mP4Green)" />
+  <text x="597" y="388" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#34d399" text-anchor="middle">8. Verify HMAC $\rightarrow$ Atomic Settlement (DEBIT Clearing, CREDIT User Wallet)</text>
+
+  <!-- Step 9: 200 OK to Gateway -->
+  <line x1="370" y1="430" x2="615" y2="430" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#mP4Green)" />
+  <text x="492" y="423" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">9. 200 OK (Webhook Processed)</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="490" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    Asynchronous Settlement: User balance is never credited on the frontend redirect; only verified server-to-server webhooks trigger ledger crediting.
+  </text>
+</svg>

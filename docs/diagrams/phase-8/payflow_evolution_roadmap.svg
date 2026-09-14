@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p8Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="cardGrad8" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <marker id="mEvo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" fill="url(#p8Bg)" />
+
+  <text x="500" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="22" font-weight="800" fill="#f8fafc" text-anchor="middle">PayFlow Master Architectural Evolution: Phase 0 $\rightarrow$ Phase 8</text>
+  <text x="500" y="60" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Progressive Maturation from Core Foundations to High-Throughput Cloud Fintech Platform</text>
+
+  <!-- Row 1: Phases 0, 1, 2 (IMPLEMENTED) -->
+  <!-- Phase 0 -->
+  <rect x="50" y="90" width="280" height="140" rx="10" fill="url(#cardGrad8)" stroke="#10b981" stroke-width="1.8" />
+  <rect x="65" y="105" width="250" height="24" rx="4" fill="#10b981" opacity="0.15" />
+  <text x="190" y="122" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#10b981" text-anchor="middle">PHASE 0: FOUNDATIONS [VERIFIED]</text>
+  <text x="65" y="150" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Scaffolding &amp; Modular Monolith</text>
+  <text x="65" y="168" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Express, TypeScript, Zod, pg.Pool</text>
+  <text x="65" y="184" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• 11 Core DB Tables &amp; Migrations</text>
+  <text x="65" y="200" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Standard JSON Response Envelope</text>
+  <text x="65" y="218" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#34d399">Built in Phase 0</text>
+
+  <line x1="330" y1="160" x2="365" y2="160" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 1 -->
+  <rect x="375" y="90" width="280" height="140" rx="10" fill="url(#cardGrad8)" stroke="#10b981" stroke-width="1.8" />
+  <rect x="390" y="105" width="250" height="24" rx="4" fill="#10b981" opacity="0.15" />
+  <text x="515" y="122" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#10b981" text-anchor="middle">PHASE 1: AUTH &amp; RBAC [VERIFIED]</text>
+  <text x="390" y="150" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Stateless Access + Refresh Rotation</text>
+  <text x="390" y="168" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Token Family Replay Detection</text>
+  <text x="390" y="184" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• RBAC: USER &amp; ADMIN Guards</text>
+  <text x="390" y="200" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• React Redux SPA + Axios Interceptor</text>
+  <text x="390" y="218" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#34d399">Built in Phase 1</text>
+
+  <line x1="655" y1="160" x2="690" y2="160" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 2 -->
+  <rect x="700" y="90" width="250" height="140" rx="10" fill="url(#cardGrad8)" stroke="#10b981" stroke-width="1.8" />
+  <rect x="715" y="105" width="220" height="24" rx="4" fill="#10b981" opacity="0.15" />
+  <text x="825" y="122" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#10b981" text-anchor="middle">PHASE 2: WALLET &amp; LEDGER [VERIFIED]</text>
+  <text x="715" y="150" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Double-Entry Engine (ΣD == ΣC)</text>
+  <text x="715" y="168" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Row Locking: SELECT FOR UPDATE</text>
+  <text x="715" y="184" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Deterministic ORDER BY id ASC</text>
+  <text x="715" y="200" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Deposit Primitive &amp; Wallet View</text>
+  <text x="715" y="218" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#34d399">Built in Phase 2</text>
+
+  <!-- Transition Arrow Row 1 -> Row 2 -->
+  <line x1="825" y1="230" x2="825" y2="260" stroke="#6366f1" stroke-width="2" />
+  <line x1="825" y1="260" x2="190" y2="260" stroke="#6366f1" stroke-width="2" />
+  <line x1="190" y1="260" x2="190" y2="275" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Row 2: Phases 3, 4, 5 (PLANNED) -->
+  <!-- Phase 3 -->
+  <rect x="50" y="280" width="280" height="140" rx="10" fill="url(#cardGrad8)" stroke="#6366f1" stroke-width="1.5" />
+  <rect x="65" y="295" width="250" height="24" rx="4" fill="#6366f1" opacity="0.15" />
+  <text x="190" y="312" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#818cf8" text-anchor="middle">PHASE 3: TRANSFERS &amp; IDEMPOTENCY</text>
+  <text x="65" y="340" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Peer-to-Peer Wallet Transfers</text>
+  <text x="65" y="358" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• L1 Fast-Path Mutex: Redis SETNX</text>
+  <text x="65" y="374" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• L2 Durable Store: idempotency_keys</text>
+  <text x="65" y="390" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• SHA-256 Request Hash Guard</text>
+  <text x="65" y="408" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#818cf8">Phase 3 Planned</text>
+
+  <line x1="330" y1="350" x2="365" y2="350" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 4 -->
+  <rect x="375" y="280" width="280" height="140" rx="10" fill="url(#cardGrad8)" stroke="#f59e0b" stroke-width="1.5" />
+  <rect x="390" y="295" width="250" height="24" rx="4" fill="#f59e0b" opacity="0.15" />
+  <text x="515" y="312" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fcd34d" text-anchor="middle">PHASE 4: GATEWAY &amp; WEBHOOKS</text>
+  <text x="390" y="340" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Payment Intents State Machine</text>
+  <text x="390" y="358" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Mock Gateway Simulated Checkout</text>
+  <text x="390" y="374" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Webhook HMAC-SHA256 Verification</text>
+  <text x="390" y="390" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Deduplication &amp; Refund Handling</text>
+  <text x="390" y="408" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#fcd34d">Phase 4 Planned</text>
+
+  <line x1="655" y1="350" x2="690" y2="350" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 5 -->
+  <rect x="700" y="280" width="250" height="140" rx="10" fill="url(#cardGrad8)" stroke="#a855f7" stroke-width="1.5" />
+  <rect x="715" y="295" width="220" height="24" rx="4" fill="#a855f7" opacity="0.15" />
+  <text x="825" y="312" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#d8b4fe" text-anchor="middle">PHASE 5: SQS &amp; ASYNC OUTBOX</text>
+  <text x="715" y="340" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Transactional Outbox Pattern</text>
+  <text x="715" y="358" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• SKIP LOCKED Outbox Poller</text>
+  <text x="715" y="374" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• AWS SQS FIFO (GroupId = wallet_id)</text>
+  <text x="715" y="390" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Redis Sliding Window Rate Limiting</text>
+  <text x="715" y="408" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#d8b4fe">Phase 5 Planned</text>
+
+  <!-- Transition Arrow Row 2 -> Row 3 -->
+  <line x1="825" y1="420" x2="825" y2="445" stroke="#6366f1" stroke-width="2" />
+  <line x1="825" y1="445" x2="190" y2="445" stroke="#6366f1" stroke-width="2" />
+  <line x1="190" y1="445" x2="190" y2="455" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Row 3: Phases 6, 7, 8 (PLANNED) -->
+  <!-- Phase 6 -->
+  <rect x="50" y="460" width="280" height="135" rx="10" fill="url(#cardGrad8)" stroke="#f43f5e" stroke-width="1.5" />
+  <rect x="65" y="472" width="250" height="22" rx="4" fill="#f43f5e" opacity="0.15" />
+  <text x="190" y="487" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fda4af" text-anchor="middle">PHASE 6: FRAUD &amp; RECONCILIATION</text>
+  <text x="65" y="512" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Velocity &amp; Volume Risk Rules</text>
+  <text x="65" y="528" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Actions: ALLOW, REVIEW, BLOCK</text>
+  <text x="65" y="544" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Nightly 3-Way Reconciliation Engine</text>
+  <text x="65" y="560" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Variance &amp; Discrepancy Auditing</text>
+  <text x="65" y="578" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#f87171">Phase 6 Planned</text>
+
+  <line x1="330" y1="527" x2="365" y2="527" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 7 -->
+  <rect x="375" y="460" width="280" height="135" rx="10" fill="url(#cardGrad8)" stroke="#38bdf8" stroke-width="1.5" />
+  <rect x="390" y="472" width="250" height="22" rx="4" fill="#38bdf8" opacity="0.15" />
+  <text x="515" y="487" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#38bdf8" text-anchor="middle">PHASE 7: AWS CLOUD &amp; CI/CD</text>
+  <text x="390" y="512" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• ECS Fargate Multi-AZ Deployment</text>
+  <text x="390" y="528" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• RDS Postgres Multi-AZ + ElastiCache</text>
+  <text x="390" y="544" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• GitHub Actions Automated Pipeline</text>
+  <text x="390" y="560" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Zero-Downtime Rolling Deploys</text>
+  <text x="390" y="578" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#38bdf8">Phase 7 Planned</text>
+
+  <line x1="655" y1="527" x2="690" y2="527" stroke="#6366f1" stroke-width="2" marker-end="url(#mEvo)" />
+
+  <!-- Phase 8 -->
+  <rect x="700" y="460" width="250" height="135" rx="10" fill="url(#cardGrad8)" stroke="#6366f1" stroke-width="1.5" />
+  <rect x="715" y="472" width="220" height="22" rx="4" fill="#6366f1" opacity="0.15" />
+  <text x="825" y="487" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#c7d2fe" text-anchor="middle">PHASE 8: HARDENING &amp; INTERVIEW</text>
+  <text x="715" y="512" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" font-weight="700">• Chaos &amp; Partition Drills</text>
+  <text x="715" y="528" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Production Hardening Checklist</text>
+  <text x="715" y="544" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Master 90s &amp; 5m Interview Scripts</text>
+  <text x="715" y="560" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• 30+ Fintech System Design Q&amp;As</text>
+  <text x="715" y="578" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#c7d2fe">Phase 8 Planned</text>
+</svg>

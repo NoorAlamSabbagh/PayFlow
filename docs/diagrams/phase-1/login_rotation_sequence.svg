@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p1bBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="cardB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <marker id="mBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="mGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p1bBg)" />
+
+  <text x="480" y="40" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Refresh Token Rotation &amp; Seamless 401 Queue Lifecycle</text>
+  <text x="480" y="62" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Short-Lived Access Token Expiry $\rightarrow$ Single In-Flight Rotation $\rightarrow$ Request Queue Replay</text>
+
+  <!-- Actors -->
+  <rect x="80" y="90" width="130" height="40" rx="8" fill="url(#cardB)" stroke="#38bdf8" stroke-width="1.5" />
+  <text x="145" y="115" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" text-anchor="middle">React (Axios Interceptor)</text>
+  <line x1="145" y1="130" x2="145" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <rect x="415" y="90" width="130" height="40" rx="8" fill="url(#cardB)" stroke="#6366f1" stroke-width="1.5" />
+  <text x="480" y="115" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#818cf8" text-anchor="middle">Express Auth Controller</text>
+  <line x1="480" y1="130" x2="480" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <rect x="750" y="90" width="130" height="40" rx="8" fill="url(#cardB)" stroke="#10b981" stroke-width="1.5" />
+  <text x="815" y="115" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#6ee7b7" text-anchor="middle">refresh_tokens Table</text>
+  <line x1="815" y1="130" x2="815" y2="480" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Step 1: 401 Unauthorized -->
+  <line x1="145" y1="160" x2="470" y2="160" stroke="#f43f5e" stroke-width="2" marker-end="url(#mBlue)" />
+  <text x="310" y="152" font-family="JetBrains Mono, monospace" font-size="10" fill="#fb7185" text-anchor="middle">1. API hit with Expired 15m Access Token $\rightarrow$ 401 Unauthorized</text>
+
+  <!-- Step 2: Queue Incoming Requests -->
+  <rect x="75" y="180" width="140" height="35" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+  <text x="145" y="196" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#fcd34d" text-anchor="middle">2. isRefreshing = true</text>
+  <text x="145" y="209" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Queue concurrent calls</text>
+
+  <!-- Step 3: Call /refresh -->
+  <line x1="145" y1="240" x2="470" y2="240" stroke="#38bdf8" stroke-width="2" marker-end="url(#mBlue)" />
+  <text x="310" y="232" font-family="JetBrains Mono, monospace" font-size="10" fill="#38bdf8" text-anchor="middle">3. POST /auth/refresh (Cookie: refreshToken)</text>
+
+  <!-- Step 4: Verify hash and token state -->
+  <line x1="480" y1="270" x2="805" y2="270" stroke="#10b981" stroke-width="2" marker-end="url(#mGreen)" />
+  <text x="645" y="262" font-family="JetBrains Mono, monospace" font-size="10" fill="#34d399" text-anchor="middle">4. SELECT WHERE token_hash = $1 (is_revoked=false?)</text>
+
+  <!-- Step 5: Invalidate old token and create new generation -->
+  <line x1="480" y1="310" x2="805" y2="310" stroke="#10b981" stroke-width="2" marker-end="url(#mGreen)" />
+  <text x="645" y="302" font-family="JetBrains Mono, monospace" font-size="10" fill="#34d399" text-anchor="middle">5. UPDATE is_revoked = true &amp; INSERT new token in family</text>
+
+  <!-- Step 6: 200 OK with fresh tokens -->
+  <line x1="480" y1="355" x2="155" y2="355" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#mGreen)" />
+  <text x="310" y="348" font-family="JetBrains Mono, monospace" font-size="10" fill="#34d399" text-anchor="middle">6. 200 OK { accessToken: freshJWT } + New HttpOnly Cookie</text>
+
+  <!-- Step 7: Flush Queued Requests -->
+  <rect x="75" y="380" width="140" height="35" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
+  <text x="145" y="396" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">7. processQueue(null)</text>
+  <text x="145" y="409" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Replay failed calls cleanly</text>
+
+  <!-- Step 8: Replay original request -->
+  <line x1="145" y1="440" x2="470" y2="440" stroke="#6366f1" stroke-width="2" marker-end="url(#mBlue)" />
+  <text x="310" y="432" font-family="JetBrains Mono, monospace" font-size="10" fill="#a5b4fc" text-anchor="middle">8. Re-issue original request with fresh Bearer token $\rightarrow$ 200 OK</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="80" y="480" width="800" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="498" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    Security Tradeoff: Access token stays purely in memory (immune to XSS theft); Refresh token locked in HttpOnly cookie
+  </text>
+</svg>

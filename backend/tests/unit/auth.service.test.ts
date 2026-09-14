@@ -6,6 +6,9 @@ import { ConflictError, UnauthorizedError } from '../../src/utils/errors';
 import { UserEntity } from '../../src/modules/user/user.types';
 import { RefreshTokenEntity } from '../../src/modules/auth/auth.types';
 
+import { WalletRepository } from '../../src/modules/wallet/wallet.repository';
+import { WalletEntity } from '../../src/modules/wallet/wallet.types';
+
 // Mock getClient and transaction methods from database
 jest.mock('../../src/database', () => ({
   getClient: jest.fn().mockResolvedValue({
@@ -19,6 +22,7 @@ describe('AuthService Unit Tests', () => {
   let authService: AuthService;
   let mockUserRepo: jest.Mocked<UserRepository>;
   let mockTokenRepo: jest.Mocked<RefreshTokenRepository>;
+  let mockWalletRepo: jest.Mocked<WalletRepository>;
 
   const mockUser: UserEntity = {
     id: '11111111-1111-1111-1111-111111111111',
@@ -50,7 +54,15 @@ describe('AuthService Unit Tests', () => {
       revokeAllUserTokens: jest.fn(),
     } as unknown as jest.Mocked<RefreshTokenRepository>;
 
-    authService = new AuthService(mockUserRepo, mockTokenRepo);
+    mockWalletRepo = {
+      createWallet: jest.fn().mockResolvedValue({} as WalletEntity),
+      findByUserId: jest.fn(),
+      findById: jest.fn(),
+      findAndLockWallets: jest.fn(),
+      updateBalance: jest.fn(),
+    } as unknown as jest.Mocked<WalletRepository>;
+
+    authService = new AuthService(mockUserRepo, mockTokenRepo, mockWalletRepo);
   });
 
   describe('Registration', () => {
@@ -70,6 +82,7 @@ describe('AuthService Unit Tests', () => {
       expect(result.accessToken).toBeDefined();
       expect(result.refreshToken).toBeDefined();
       expect(mockUserRepo.createUser).toHaveBeenCalled();
+      expect(mockWalletRepo.createWallet).toHaveBeenCalled();
       expect(mockTokenRepo.createRefreshToken).toHaveBeenCalled();
     });
 

@@ -57,10 +57,10 @@ cp .env.example .env
 
 ## 📊 Development Phases
 - [x] **Phase 0:** Architecture, Repository Structure, Database Design & Documentation
-- [ ] **Phase 1:** Project Foundation, Authentication, Users, RBAC & Core UI
-- [ ] **Phase 2:** Wallet and Double-Entry Ledger
-- [ ] **Phase 3:** Wallet-to-Wallet Transfers and Distributed Idempotency
-- [ ] **Phase 4:** Mock Payment Gateway, Payment States, Webhooks & Refunds
+- [x] **Phase 1:** Project Foundation, Authentication, Users, RBAC & Core UI
+- [x] **Phase 2:** Wallet and Double-Entry Ledger
+- [x] **Phase 3:** Wallet-to-Wallet Transfers and Distributed Idempotency
+- [x] **Phase 4:** Payment Gateway, Payment Intents, Webhooks & External Settlement
 - [ ] **Phase 5:** Redis Caching, AWS SQS & Asynchronous Workers
 - [ ] **Phase 6:** Fraud/Risk Rules & Ledger Reconciliation
 - [ ] **Phase 7:** AWS Deployment, Docker Multi-Stage, CI/CD & CloudWatch

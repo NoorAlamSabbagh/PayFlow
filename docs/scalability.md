@@ -36,3 +36,33 @@ Standard SQS FIFO enforces a maximum throughput of 300 messages/sec (or 3,000/se
 - **Token Bucket Rate Limiting:** Executes atomic Lua scripts in Redis to enforce per-IP and per-user limits without database hits.
 - **Short-Lived User Profile Caching:** Cached with 60-second TTL. Invalidated instantly upon profile update.
 - **Redis Cluster Readiness:** All idempotency keys and cache keys utilize hash tags (e.g. `{user:123}:idempotency`) to ensure related keys map to the exact same hash slot in a clustered Redis deployment.
+
+---
+
+## 4. Phase 4: Webhook Scalability & Ingestion Decoupling
+
+### 4.1 Current Phase 4 Monolithic Scalability
+- **Direct Database Transaction:** The webhook endpoint verifies HMAC signatures in-memory (O(1) CPU) and commits the settlement transaction inside a bounded PostgreSQL connection (`pg.Pool`).
+- **Ingress Deduplication Performance:** Indexed lookups on `(gateway_name, gateway_event_id)` take < 1ms, instantly filtering retried webhooks before transaction initiation.
+- **Pessimistic Lock Isolation:** Locks are held only for the minimum duration required to insert 1 transaction, 2 ledger entries, 1 outbox event, and update 2 wallet balances (typically ~10–25ms execution time).
+
+### 4.2 Future High-Throughput Scale Architecture (Phase 5 / AWS Preparation)
+In hyper-scale environments handling 10,000+ webhooks/second during flash sales:
+1. **Ingress Decoupling via Queue Buffering:**
+   ```
+   [ Gateway Webhook ] ──► [ Lightweight Ingress API ] ──► [ AWS SQS Webhook Queue ]
+                                                                     │
+                                                                     ▼
+                                                          [ Autoscaling Worker Pool ]
+                                                                     │
+                                                          [ PostgreSQL Settlement ]
+   ```
+   - Ingress API only verifies the HMAC signature and writes the raw payload to an SQS FIFO queue with `MessageGroupId = gatewayOrderId`.
+   - Responds HTTP 200 OK to the payment gateway within 5ms.
+   - Dedicated consumer workers pull from SQS, deduplicate via `webhook_events`, and execute double-entry ledger transactions without backpressuring the public webhook endpoint.
+2. **Dead-Letter Queues (DLQ) & Retry Policies:**
+   - Webhook processing failures (e.g. temporary database lock timeout) retry up to 5 times with exponential backoff.
+   - Malformed payloads or persistent failures route to an SQS Dead-Letter Queue for alerting and manual operations inspection.
+3. **Database Read Replicas:**
+   - Read-heavy queries (`GET /payments`, `GET /wallets/ledger`) route to Aurora PostgreSQL Read Replicas, isolating the Primary DB write path for authoritative webhook settlement.
+

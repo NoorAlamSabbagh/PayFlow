@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p7Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0e172a" />
+    </linearGradient>
+    <marker id="mAws" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#f59e0b" />
+    </marker>
+    <marker id="mBlue7" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p7Bg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Phase 7 Production AWS Infrastructure Architecture</text>
+  <text x="480" y="60" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Multi-AZ Resilient Deployment • ECS Fargate Containers • Aurora Multi-AZ • ElastiCache Redis</text>
+
+  <!-- External Traffic Entry -->
+  <rect x="50" y="95" width="150" height="110" rx="10" fill="#111827" stroke="#38bdf8" stroke-width="1.5" />
+  <text x="125" y="125" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#38bdf8" text-anchor="middle">CLIENTS / INTERNET</text>
+  <text x="125" y="150" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Web SPA (React)</text>
+  <text x="125" y="168" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Gateway Webhooks</text>
+  <text x="125" y="186" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Mobile API Clients</text>
+
+  <!-- Arrow to Route 53 / ALB -->
+  <line x1="200" y1="150" x2="255" y2="150" stroke="#38bdf8" stroke-width="2" marker-end="url(#mBlue7)" />
+
+  <!-- AWS VPC Box -->
+  <rect x="265" y="90" width="650" height="385" rx="14" fill="#0b1120" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4" />
+  <text x="290" y="115" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#fcd34d">AWS REGION (VPC: 10.0.0.0/16)</text>
+
+  <!-- Application Load Balancer -->
+  <rect x="285" y="130" width="130" height="90" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="350" y="155" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fcd34d" text-anchor="middle">AWS ALB</text>
+  <text x="350" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Application Load Balancer</text>
+  <text x="350" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#cbd5e1" text-anchor="middle">TLS 1.3 Termination</text>
+  <text x="350" y="208" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#cbd5e1" text-anchor="middle">AWS WAF Rules</text>
+
+  <!-- Arrow ALB -> Compute -->
+  <line x1="415" y1="175" x2="470" y2="175" stroke="#f59e0b" stroke-width="2" marker-end="url(#mAws)" />
+
+  <!-- Compute Subnet: ECS Fargate -->
+  <rect x="480" y="130" width="190" height="150" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="1.2" />
+  <text x="575" y="155" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#818cf8" text-anchor="middle">ECS FARGATE (TASKS)</text>
+  <rect x="495" y="170" width="160" height="40" rx="4" fill="#0f172a" />
+  <text x="575" y="188" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#f8fafc" text-anchor="middle">PayFlow API Task 1</text>
+  <text x="575" y="202" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#34d399" text-anchor="middle">Healthy (AZ-1)</text>
+
+  <rect x="495" y="220" width="160" height="40" rx="4" fill="#0f172a" />
+  <text x="575" y="238" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#f8fafc" text-anchor="middle">PayFlow API Task 2</text>
+  <text x="575" y="252" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#34d399" text-anchor="middle">Healthy (AZ-2)</text>
+
+  <!-- Arrow Compute -> Data Stores -->
+  <line x1="670" y1="175" x2="725" y2="175" stroke="#10b981" stroke-width="2" marker-end="url(#mAws)" />
+  <line x1="670" y1="240" x2="725" y2="280" stroke="#f59e0b" stroke-width="2" marker-end="url(#mAws)" />
+
+  <!-- Persistence Tier (Private Subnets) -->
+  <!-- RDS PostgreSQL -->
+  <rect x="735" y="130" width="165" height="110" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.2" />
+  <text x="817" y="155" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#6ee7b7" text-anchor="middle">AWS RDS POSTGRESQL</text>
+  <text x="817" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#f8fafc" text-anchor="middle">Multi-AZ Primary &amp; Standby</text>
+  <text x="817" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#94a3b8" text-anchor="middle">• Automatic Failover</text>
+  <text x="817" y="210" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#94a3b8" text-anchor="middle">• Read Replica for Reports</text>
+  <text x="817" y="225" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#34d399" text-anchor="middle">• Encrypted EBS KMS</text>
+
+  <!-- ElastiCache Redis -->
+  <rect x="735" y="255" width="165" height="90" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="817" y="280" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fcd34d" text-anchor="middle">ELASTICACHE REDIS</text>
+  <text x="817" y="298" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#f8fafc" text-anchor="middle">Clustered In-Memory</text>
+  <text x="817" y="316" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#94a3b8" text-anchor="middle">• Idempotency Mutex</text>
+  <text x="817" y="330" font-family="Plus Jakarta Sans, sans-serif" font-size="8.5" fill="#94a3b8" text-anchor="middle">• Sliding Window Rate Limit</text>
+
+  <!-- Outbox Relay & SQS FIFO Row -->
+  <rect x="285" y="300" width="385" height="150" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="1.2" />
+  <text x="477" y="325" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#d8b4fe" text-anchor="middle">ASYNC EVENT STREAMING (OUTBOX RELAY &amp; AWS SQS FIFO)</text>
+
+  <rect x="300" y="340" width="160" height="95" rx="6" fill="#0f172a" />
+  <text x="380" y="362" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">Outbox Relay Worker</text>
+  <text x="380" y="380" font-family="JetBrains Mono, monospace" font-size="8" fill="#cbd5e1" text-anchor="middle">SKIP LOCKED Poller</text>
+  <text x="380" y="396" font-family="Plus Jakarta Sans, sans-serif" font-size="8" fill="#94a3b8" text-anchor="middle">Reads outbox_events</text>
+  <text x="380" y="412" font-family="Plus Jakarta Sans, sans-serif" font-size="8" fill="#a855f7" text-anchor="middle">Publishes to SQS FIFO</text>
+
+  <rect x="480" y="340" width="175" height="95" rx="6" fill="#0f172a" />
+  <text x="567" y="362" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#fcd34d" text-anchor="middle">AWS SQS FIFO + DLQ</text>
+  <text x="567" y="380" font-family="JetBrains Mono, monospace" font-size="8" fill="#cbd5e1" text-anchor="middle">payflow-events.fifo</text>
+  <text x="567" y="396" font-family="Plus Jakarta Sans, sans-serif" font-size="8" fill="#94a3b8" text-anchor="middle">GroupId: wallet_id</text>
+  <text x="567" y="412" font-family="Plus Jakarta Sans, sans-serif" font-size="8" fill="#f43f5e" text-anchor="middle">Dead-Letter Queue (DLQ)</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="490" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    High Availability: No single point of failure • Database is isolated in private subnets with zero direct public ingress.
+  </text>
+</svg>

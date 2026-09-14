@@ -8,6 +8,9 @@ const router = Router();
 // Authenticated user profile
 router.get('/me', requireAuth, userController.getMe);
 
+// List active counterparties for transfer recipient selection
+router.get('/counterparties', requireAuth, userController.getCounterparties);
+
 // Admin-only protected route for verifying RBAC enforcement
 router.get('/', requireAuth, requireRole('ADMIN'), userController.getAllUsers);
 

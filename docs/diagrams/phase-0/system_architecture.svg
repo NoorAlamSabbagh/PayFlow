@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="540" fill="url(#bgGrad)" />
+  <circle cx="200" cy="100" r="180" fill="#6366f1" opacity="0.05" filter="url(#glow)" />
+  <circle cx="800" cy="400" r="180" fill="#10b981" opacity="0.04" filter="url(#glow)" />
+
+  <!-- Title Header -->
+  <text x="480" y="45" font-family="Plus Jakarta Sans, sans-serif" font-size="22" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="-0.02em">PayFlow High-Level System Architecture</text>
+  <text x="480" y="70" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Phase 0 Baseline • Client Gateway, Modular Monolith &amp; Storage Subsystems</text>
+
+  <!-- Container 1: Client Application (SPA) -->
+  <rect x="50" y="120" width="200" height="340" rx="14" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5" />
+  <rect x="65" y="135" width="170" height="30" rx="6" fill="#6366f1" opacity="0.15" />
+  <text x="150" y="155" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700" fill="#a5b4fc" text-anchor="middle">CLIENT LAYER</text>
+  
+  <rect x="65" y="180" width="170" height="55" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1" />
+  <text x="150" y="202" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#f8fafc" text-anchor="middle">React 18 + Vite</text>
+  <text x="150" y="222" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">TypeScript • Vanilla CSS</text>
+
+  <rect x="65" y="250" width="170" height="55" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1" />
+  <text x="150" y="272" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#f8fafc" text-anchor="middle">Redux Toolkit</text>
+  <text x="150" y="292" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">In-Memory Token &amp; State</text>
+
+  <rect x="65" y="320" width="170" height="55" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1" />
+  <text x="150" y="342" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#f8fafc" text-anchor="middle">Axios Interceptor</text>
+  <text x="150" y="362" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">401 Queue &amp; Token Refresh</text>
+
+  <rect x="65" y="390" width="170" height="50" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1" />
+  <text x="150" y="412" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#f8fafc" text-anchor="middle">HttpOnly Cookie</text>
+  <text x="150" y="428" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">SameSite=Strict Refresh</text>
+
+  <!-- Connecting Arrows Client -> Backend -->
+  <line x1="250" y1="210" x2="330" y2="210" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="290" y="198" font-family="JetBrains Mono, monospace" font-size="9" fill="#818cf8" text-anchor="middle">HTTPS / REST</text>
+
+  <line x1="250" y1="350" x2="330" y2="350" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="290" y="338" font-family="JetBrains Mono, monospace" font-size="9" fill="#818cf8" text-anchor="middle">Bearer JWT</text>
+
+  <!-- Container 2: Backend Core (Express Modular Monolith) -->
+  <rect x="340" y="105" width="310" height="370" rx="14" fill="url(#cardGrad)" stroke="#6366f1" stroke-width="1.5" />
+  <rect x="355" y="120" width="280" height="30" rx="6" fill="#6366f1" opacity="0.2" />
+  <text x="495" y="140" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="800" fill="#c7d2fe" text-anchor="middle">PAYFLOW API CORE (MODULAR MONOLITH)</text>
+
+  <!-- Middleware Stack -->
+  <rect x="355" y="165" width="280" height="42" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1" />
+  <text x="495" y="184" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#f8fafc" text-anchor="middle">Global Middleware</text>
+  <text x="495" y="198" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Helmet • CORS • CookieParser • Zod Validation • Winston</text>
+
+  <!-- Domain Modules Grid -->
+  <rect x="355" y="220" width="132" height="60" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1" />
+  <text x="421" y="244" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">Auth Module</text>
+  <text x="421" y="262" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">JWT • Rotation • Replay</text>
+
+  <rect x="503" y="220" width="132" height="60" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1" />
+  <text x="569" y="244" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">User Module</text>
+  <text x="569" y="262" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Identity • RBAC</text>
+
+  <rect x="355" y="295" width="132" height="65" rx="8" fill="#0f172a" stroke="#6366f1" stroke-width="1" />
+  <text x="421" y="318" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc" text-anchor="middle">Wallet Module</text>
+  <text x="421" y="334" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Balance • Provisioning</text>
+  <text x="421" y="348" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Row Locking (ACID)</text>
+
+  <rect x="503" y="295" width="132" height="65" rx="8" fill="#0f172a" stroke="#6366f1" stroke-width="1" />
+  <text x="569" y="318" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc" text-anchor="middle">Ledger Engine</text>
+  <text x="569" y="334" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Double-Entry Invariant</text>
+  <text x="569" y="348" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#10b981" text-anchor="middle">Σ Debits = Σ Credits</text>
+
+  <rect x="355" y="375" width="280" height="42" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1" />
+  <text x="495" y="394" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#cbd5e1" text-anchor="middle">Centralized Error &amp; Response Pipeline</text>
+  <text x="495" y="408" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Standard JSON Envelope • HTTP Statuses • No Leakage</text>
+
+  <rect x="355" y="430" width="280" height="30" rx="6" fill="#1e293b" />
+  <text x="495" y="449" font-family="JetBrains Mono, monospace" font-size="10" fill="#a5b4fc" text-anchor="middle">pg.Pool Connection Pool • ioredis Client</text>
+
+  <!-- Connecting Arrows Backend -> Data Stores -->
+  <line x1="650" y1="230" x2="720" y2="200" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)" />
+  <text x="685" y="195" font-family="JetBrains Mono, monospace" font-size="8" fill="#34d399" text-anchor="middle">ACID / SQL</text>
+
+  <line x1="650" y1="360" x2="720" y2="390" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowGreen)" />
+  <text x="685" y="395" font-family="JetBrains Mono, monospace" font-size="8" fill="#fbbf24" text-anchor="middle">CACHE / MUTEX</text>
+
+  <!-- Container 3: Storage & Infrastructure Layer -->
+  <rect x="730" y="120" width="180" height="340" rx="14" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5" />
+  <rect x="745" y="135" width="150" height="30" rx="6" fill="#10b981" opacity="0.15" />
+  <text x="820" y="155" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#6ee7b7" text-anchor="middle">PERSISTENCE</text>
+
+  <!-- PostgreSQL Card -->
+  <rect x="745" y="180" width="150" height="110" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.2" />
+  <text x="820" y="204" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#6ee7b7" text-anchor="middle">PostgreSQL 16</text>
+  <text x="820" y="222" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#f8fafc" text-anchor="middle">Relational Source of Truth</text>
+  <text x="820" y="240" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">• wallets (BIGINT paise)</text>
+  <text x="820" y="254" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">• ledger_entries (Immutable)</text>
+  <text x="820" y="268" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">• transactions, users</text>
+  <text x="820" y="282" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#34d399" text-anchor="middle">Row Locking: FOR UPDATE</text>
+
+  <!-- Redis Card -->
+  <rect x="745" y="310" width="150" height="95" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="820" y="334" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#fcd34d" text-anchor="middle">Redis In-Memory</text>
+  <text x="820" y="352" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#f8fafc" text-anchor="middle">Fast-Path Volatile State</text>
+  <text x="820" y="370" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">• L1 Idempotency Mutex</text>
+  <text x="820" y="384" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">• Rate Limiting (Token Bucket)</text>
+  <text x="820" y="398" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#fbbf24" text-anchor="middle">SETNX EX 30</text>
+
+  <!-- Footer Indicator -->
+  <rect x="50" y="495" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="513" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    PayFlow Core Architecture • Non-Floating Point Arithmetic • ACID Transactions • In-Memory Fast Path • Zero Orphan State
+  </text>
+</svg>

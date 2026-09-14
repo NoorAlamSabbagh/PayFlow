@@ -51,4 +51,12 @@ export const config = {
     secure: process.env.NODE_ENV === 'production',
     sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
   },
+
+  paymentGateway: {
+    defaultProvider: process.env.PAYMENT_GATEWAY_PROVIDER || 'MOCK_GATEWAY',
+    mockWebhookSecret: process.env.MOCK_WEBHOOK_SECRET || 'dev_mock_webhook_secret_for_testing_purposes',
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || '',
+    razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || '',
+  },
 } as const;

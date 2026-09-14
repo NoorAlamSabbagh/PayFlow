@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p1cBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#1a0f1d" />
+    </linearGradient>
+    <linearGradient id="alertCard" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d121e" />
+      <stop offset="100%" stop-color="#180b12" />
+    </linearGradient>
+    <marker id="mDanger" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#f43f5e" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p1cBg)" />
+
+  <text x="480" y="40" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Token Family Replay Attack Detection &amp; Instant Revocation</text>
+  <text x="480" y="62" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#f43f5e" text-anchor="middle">Critical Fintech Security Defense: Stolen Token Replay Flags Active Compromise</text>
+
+  <!-- Flow Boxes -->
+  <!-- Box 1: Legitimate User Rotation -->
+  <rect x="60" y="110" width="260" height="150" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+  <rect x="75" y="125" width="230" height="26" rx="4" fill="#6366f1" opacity="0.15" />
+  <text x="190" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#818cf8" text-anchor="middle">STEP A: Normal Legitimate Rotation</text>
+  <text x="75" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#cbd5e1">• Token Gen 1 used by Alice</text>
+  <text x="75" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#cbd5e1">• Server rotates to Token Gen 2</text>
+  <text x="75" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#cbd5e1">• Token Gen 1 marked: <tspan fill="#f59e0b" font-weight="700">is_revoked = true</tspan></text>
+  <text x="75" y="235" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#cbd5e1">• Both share <tspan fill="#38bdf8" font-family="JetBrains Mono, monospace">family_id: F1</tspan></text>
+
+  <!-- Arrow A -> B -->
+  <line x1="320" y1="185" x2="380" y2="185" stroke="#f43f5e" stroke-width="2" marker-end="url(#mDanger)" />
+
+  <!-- Box 2: Attacker Attempts Replay -->
+  <rect x="390" y="110" width="260" height="150" rx="10" fill="url(#alertCard)" stroke="#f43f5e" stroke-width="1.5" />
+  <rect x="405" y="125" width="230" height="26" rx="4" fill="#f43f5e" opacity="0.25" />
+  <text x="520" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#fda4af" text-anchor="middle">STEP B: Malicious Replay of Gen 1</text>
+  <text x="405" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#fecdd3">• Attacker intercepts older Gen 1</text>
+  <text x="405" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#fecdd3">• Attacker calls: <tspan font-family="JetBrains Mono, monospace" font-size="10">POST /auth/refresh</tspan></text>
+  <text x="405" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#fecdd3">• DB detects: <tspan fill="#f43f5e" font-weight="800">is_revoked == TRUE</tspan></text>
+  <text x="405" y="235" font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#fecdd3">• <tspan fill="#fb7185" font-weight="700">SECURITY TRIGGER: Theft in Progress!</tspan></text>
+
+  <!-- Arrow B -> C -->
+  <line x1="650" y1="185" x2="700" y2="185" stroke="#f43f5e" stroke-width="2" marker-end="url(#mDanger)" />
+
+  <!-- Box 3: Immediate Nuclear Defense -->
+  <rect x="710" y="110" width="200" height="150" rx="10" fill="#180b12" stroke="#f43f5e" stroke-width="2" />
+  <rect x="725" y="125" width="170" height="26" rx="4" fill="#f43f5e" opacity="0.3" />
+  <text x="810" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fda4af" text-anchor="middle">STEP C: Family Annihilation</text>
+  <text x="725" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#fecdd3">• Revoke ALL tokens in <tspan fill="#38bdf8">F1</tspan></text>
+  <text x="725" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#fecdd3">• Attacker kicked out instantly</text>
+  <text x="725" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#fecdd3">• Legitimate user forced to re-login</text>
+  <text x="725" y="235" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#fecdd3">• Winston logs <tspan fill="#f59e0b">SECURITY ALERT</tspan></text>
+
+  <!-- Detailed Database Execution Box -->
+  <rect x="60" y="290" width="850" height="180" rx="12" fill="#0b1120" stroke="#334155" stroke-width="1.5" />
+  <text x="85" y="320" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700" fill="#38bdf8">Database State Machine: refresh_tokens Table During Replay Attack</text>
+
+  <rect x="85" y="335" width="800" height="110" rx="6" fill="#030712" stroke="#1e293b" stroke-width="1" />
+  <text x="100" y="360" font-family="JetBrains Mono, monospace" font-size="11" fill="#94a3b8">ID                                   | FAMILY_ID | TOKEN_HASH (SHA256) | IS_REVOKED | STATE AFTER ATTACK</text>
+  <text x="100" y="380" font-family="JetBrains Mono, monospace" font-size="11" fill="#f43f5e">-------------------------------------+-----------+---------------------+------------+--------------------</text>
+  <text x="100" y="400" font-family="JetBrains Mono, monospace" font-size="11" fill="#f87171">e1a2b3c4-... (Gen 1 - Replayed)      | F1        | a9b8c7...           | TRUE       | ATTACK VECTOR DETECTED</text>
+  <text x="100" y="420" font-family="JetBrains Mono, monospace" font-size="11" fill="#f87171">f2b3c4d5-... (Gen 2 - Active)        | F1        | b1c2d3...           | TRUE       | CASCADE REVOKED BY REPO</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="60" y="490" width="850" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="485" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    RFC 6749 Compliant: Replay detection protects stolen credentials even if an attacker intercepts cookies over an insecure client network.
+  </text>
+</svg>

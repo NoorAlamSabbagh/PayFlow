@@ -6,6 +6,8 @@ import { checkAuth } from './features/auth/authSlice';
 import { Login } from './features/auth/Login';
 import { Register } from './features/auth/Register';
 import { Dashboard } from './features/dashboard/Dashboard';
+import { WalletView } from './features/wallet/WalletView';
+import { TransferView } from './features/transfers/TransferView';
 import { Forbidden } from './components/Forbidden';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -43,6 +45,26 @@ export const App: React.FC = () => {
           <ProtectedRoute>
             <Layout>
               <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <WalletView />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/transfers"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <TransferView />
             </Layout>
           </ProtectedRoute>
         }

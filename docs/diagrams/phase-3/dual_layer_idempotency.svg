@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p3bBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0b1626" />
+    </linearGradient>
+    <marker id="mIdemp" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p3bBg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Dual-Layer Distributed Idempotency Guard (Redis + PostgreSQL)</text>
+  <text x="480" y="60" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">L1 Fast-Path In-Flight Mutex • L2 Durable Replay Store • SHA-256 Parameter Tampering Defense</text>
+
+  <!-- Left Side: L1 Redis In-Flight Mutex -->
+  <rect x="50" y="95" width="410" height="375" rx="12" fill="#111827" stroke="#f59e0b" stroke-width="1.5" />
+  <rect x="65" y="110" width="380" height="28" rx="6" fill="#f59e0b" opacity="0.15" />
+  <text x="255" y="129" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#fcd34d" text-anchor="middle">TIER 1: REDIS IN-FLIGHT MUTEX (FAST-PATH)</text>
+
+  <rect x="70" y="155" width="370" height="70" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+  <text x="85" y="178" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#fcd34d">SET idempotency:{userId}:{key} "LOCK" NX EX 30</text>
+  <text x="85" y="198" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Atomic Redis primitive executes in &lt;1ms</text>
+  <text x="85" y="214" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• 30-second TTL automatically expires if node crashes</text>
+
+  <!-- Concurrent Collision Box -->
+  <rect x="70" y="240" width="370" height="95" rx="6" fill="#180b12" stroke="#f43f5e" stroke-width="1" />
+  <text x="255" y="262" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fda4af" text-anchor="middle">CONCURRENT REQUEST RACE DETECTED</text>
+  <text x="85" y="284" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#fecdd3">• Client fires Request 1 and duplicate Request 2 simultaneously</text>
+  <text x="85" y="302" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#fecdd3">• Request 1 acquires NX mutex $\rightarrow$ Proceeds to database</text>
+  <text x="85" y="320" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" font-weight="700" fill="#f43f5e">• Request 2 fails NX $\rightarrow$ Immediate 409 Conflict (Zero DB load)</text>
+
+  <rect x="70" y="350" width="370" height="105" rx="6" fill="#1e293b" />
+  <text x="85" y="375" font-family="Plus Jakarta Sans, sans-serif" font-size="10.5" font-weight="700" fill="#f8fafc">Why Redis alone is insufficient:</text>
+  <text x="85" y="395" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Volatile in-memory store; keys expire after short TTL.</text>
+  <text x="85" y="411" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• If a client retries 10 minutes later after a network blackout,</text>
+  <text x="85" y="427" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">  Redis no longer has the key. Hence, Tier 2 is required.</text>
+
+  <!-- Right Side: L2 Durable PostgreSQL Store -->
+  <rect x="500" y="95" width="410" height="375" rx="12" fill="#111827" stroke="#10b981" stroke-width="1.5" />
+  <rect x="515" y="110" width="380" height="28" rx="6" fill="#10b981" opacity="0.15" />
+  <text x="705" y="129" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#6ee7b7" text-anchor="middle">TIER 2: POSTGRESQL DURABLE REPLAY STORE</text>
+
+  <rect x="520" y="155" width="370" height="95" rx="6" fill="#030712" stroke="#1e293b" stroke-width="1" />
+  <text x="535" y="178" font-family="JetBrains Mono, monospace" font-size="10" fill="#818cf8">TABLE idempotency_keys (</text>
+  <text x="550" y="196" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#cbd5e1">user_id UUID, key VARCHAR(255),</text>
+  <text x="550" y="212" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#fcd34d">request_hash VARCHAR(64) [SHA-256],</text>
+  <text x="550" y="228" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#34d399">response_status INT, response_body JSONB,</text>
+  <text x="550" y="244" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#818cf8">status idempotency_status ('COMPLETED')</text>
+  <text x="535" y="252" font-family="JetBrains Mono, monospace" font-size="10" fill="#818cf8">);</text>
+
+  <!-- Parameter Tampering Guard -->
+  <rect x="520" y="265" width="370" height="90" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
+  <text x="705" y="287" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#38bdf8" text-anchor="middle">PARAMETER TAMPERING DEFENSE</text>
+  <text x="535" y="307" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">request_hash = SHA256(request.body)</text>
+  <text x="535" y="325" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• If same key arrives with altered payload:</text>
+  <text x="535" y="343" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" font-weight="700" fill="#f43f5e">• REJECT with 422 Unprocessable Entity</text>
+
+  <!-- Replay Cached Result -->
+  <rect x="520" y="370" width="370" height="85" rx="6" fill="#0b1120" stroke="#10b981" stroke-width="1.2" />
+  <text x="705" y="392" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#34d399" text-anchor="middle">SEAMLESS NETWORK RETRY REPLAY</text>
+  <text x="535" y="412" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Status is COMPLETED $\rightarrow$ Return cached response_body</text>
+  <text x="535" y="430" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#34d399">• Zero ledger movements re-executed • Client receives exact 200 OK</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="490" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    Dual-Tier Idempotency provides sub-millisecond fast rejection for concurrent bursts and multi-day durable replay for network drops.
+  </text>
+</svg>

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p7bBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0b1a26" />
+    </linearGradient>
+    <marker id="mCi" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p7bBg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">GitHub Actions Continuous Integration &amp; Deployment Pipeline</text>
+  <text x="480" y="60" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Zero-Downtime Quality Gates • Strict Concurrency Test Suite • Multi-Stage Docker Builds • ECS Rolling Deploy</text>
+
+  <!-- 5 Stage Pipeline Nodes -->
+  <!-- Stage 1: Commit & Trigger -->
+  <rect x="50" y="110" width="150" height="230" rx="10" fill="#111827" stroke="#38bdf8" stroke-width="1.5" />
+  <rect x="65" y="125" width="120" height="26" rx="4" fill="#38bdf8" opacity="0.15" />
+  <text x="125" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#38bdf8" text-anchor="middle">1. PUSH TO MAIN</text>
+  <text x="65" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Git Commit push</text>
+  <text x="65" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Pull Request review</text>
+  <text x="65" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• GitHub Webhook</text>
+  <text x="65" y="245" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">triggers:</text>
+  <text x="65" y="260" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#38bdf8">.github/workflows/</text>
+  <text x="65" y="275" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#38bdf8">deploy.yml</text>
+
+  <line x1="200" y1="225" x2="225" y2="225" stroke="#10b981" stroke-width="2" marker-end="url(#mCi)" />
+
+  <!-- Stage 2: Code Quality & Unit Tests -->
+  <rect x="230" y="110" width="160" height="230" rx="10" fill="#111827" stroke="#6366f1" stroke-width="1.5" />
+  <rect x="245" y="125" width="130" height="26" rx="4" fill="#6366f1" opacity="0.15" />
+  <text x="310" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#818cf8" text-anchor="middle">2. STATIC QUALITY</text>
+  <text x="245" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• TypeScript tsc check</text>
+  <text x="245" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• 0 TypeScript errors</text>
+  <text x="245" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• 0 'any' enforcement</text>
+  <text x="245" y="245" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Jest Unit Tests:</text>
+  <text x="245" y="262" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#a5b4fc">auth.service.test</text>
+  <text x="245" y="278" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#a5b4fc">ledger.service.test</text>
+
+  <line x1="390" y1="225" x2="415" y2="225" stroke="#10b981" stroke-width="2" marker-end="url(#mCi)" />
+
+  <!-- Stage 3: Integration & Concurrency -->
+  <rect x="420" y="110" width="160" height="230" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="1.5" />
+  <rect x="435" y="125" width="130" height="26" rx="4" fill="#f59e0b" opacity="0.15" />
+  <text x="500" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fcd34d" text-anchor="middle">3. CONCURRENCY</text>
+  <text x="435" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Postgres Service Container</text>
+  <text x="435" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Database Migrations</text>
+  <text x="435" y="225" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Row Locking Tests:</text>
+  <text x="435" y="242" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#fcd34d">concurrency.test.ts</text>
+  <text x="435" y="258" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#fcd34d">immutability trigger</text>
+  <text x="435" y="275" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#10b981">Must pass 100%</text>
+
+  <line x1="580" y1="225" x2="605" y2="225" stroke="#10b981" stroke-width="2" marker-end="url(#mCi)" />
+
+  <!-- Stage 4: Docker Build -->
+  <rect x="610" y="110" width="150" height="230" rx="10" fill="#111827" stroke="#a855f7" stroke-width="1.5" />
+  <rect x="625" y="125" width="120" height="26" rx="4" fill="#a855f7" opacity="0.15" />
+  <text x="685" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#d8b4fe" text-anchor="middle">4. DOCKER BUILD</text>
+  <text x="625" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Multi-Stage Dockerfile</text>
+  <text x="625" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Strips DevDependencies</text>
+  <text x="625" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Image Security Scan</text>
+  <text x="625" y="245" font-family="JetBrains Mono, monospace" font-size="9" fill="#cbd5e1">Push to ECR:</text>
+  <text x="625" y="260" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#d8b4fe">payflow-api:sha</text>
+
+  <line x1="760" y1="225" x2="785" y2="225" stroke="#10b981" stroke-width="2" marker-end="url(#mCi)" />
+
+  <!-- Stage 5: ECS Rolling Deployment -->
+  <rect x="790" y="110" width="125" height="230" rx="10" fill="#111827" stroke="#10b981" stroke-width="1.5" />
+  <rect x="800" y="125" width="105" height="26" rx="4" fill="#10b981" opacity="0.15" />
+  <text x="852" y="142" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#6ee7b7" text-anchor="middle">5. DEPLOY</text>
+  <text x="800" y="175" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• ECS Task Def</text>
+  <text x="800" y="195" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Rolling Update</text>
+  <text x="800" y="215" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">• Health Check: /health</text>
+  <text x="800" y="245" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#34d399">Zero-Downtime</text>
+  <text x="800" y="260" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#94a3b8">Auto-rollback on error</text>
+
+  <!-- Pipeline Safety Gates Banner -->
+  <rect x="50" y="370" width="865" height="100" rx="10" fill="#0b1120" stroke="#10b981" stroke-width="1.2" />
+  <text x="75" y="398" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="800" fill="#10b981">STRICT FINTECH DEPLOYMENT GATES:</text>
+  <text x="75" y="420" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">1. If ANY unit or concurrency test fails, the deployment pipeline halts immediately before Docker build.</text>
+  <text x="75" y="438" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">2. Production database migrations execute idempotently before new container tasks are registered.</text>
+  <text x="75" y="456" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#cbd5e1">3. Amazon ECS maintains old healthy tasks until new tasks successfully pass /health with HTTP 200.</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="490" width="865" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    CI/CD Automation: Every single commit is rigorously validated against concurrency race conditions before reaching production.
+  </text>
+</svg>

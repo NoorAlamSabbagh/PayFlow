@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p4bBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0c172e" />
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="540" fill="url(#p4bBg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Inbound Webhook Verification &amp; Idempotent Deduplication</text>
+  <text x="480" y="60" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">HMAC-SHA256 Cryptographic Signature • Unique Gateway Event ID • At-Least-Once Delivery Resilience</text>
+
+  <!-- Flow Chart: Pipeline Stages -->
+  <!-- Stage 1: Inbound Webhook -->
+  <rect x="50" y="100" width="250" height="150" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="1.5" />
+  <rect x="65" y="115" width="220" height="26" rx="4" fill="#f59e0b" opacity="0.15" />
+  <text x="175" y="132" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#fcd34d" text-anchor="middle">STAGE 1: INBOUND WEBHOOK</text>
+  <text x="65" y="160" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#cbd5e1">POST /webhooks/gateway</text>
+  <text x="65" y="178" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Header: X-PayFlow-Signature</text>
+  <text x="65" y="196" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Payload: gateway_event_id, order_id</text>
+  <text x="65" y="214" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#94a3b8">• Status: 'payment.captured'</text>
+  <text x="65" y="232" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#f59e0b">Unauthenticated public endpoint</text>
+
+  <!-- Stage 2: HMAC Verification -->
+  <rect x="350" y="100" width="260" height="150" rx="10" fill="#111827" stroke="#6366f1" stroke-width="1.5" />
+  <rect x="365" y="115" width="230" height="26" rx="4" fill="#6366f1" opacity="0.15" />
+  <text x="480" y="132" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#a5b4fc" text-anchor="middle">STAGE 2: HMAC VERIFICATION</text>
+  <text x="365" y="160" font-family="JetBrains Mono, monospace" font-size="9" fill="#818cf8">computed = HMAC_SHA256(rawBody, secret)</text>
+  <text x="365" y="180" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Constant-time comparison prevents timing attacks</text>
+  <text x="365" y="200" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#f43f5e">• Signature mismatch $\rightarrow$ 401 Unauthorized</text>
+  <text x="365" y="225" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" font-weight="700" fill="#34d399">• Valid Signature $\rightarrow$ Proceed to Deduplication</text>
+
+  <!-- Stage 3: Deduplication Barrier -->
+  <rect x="660" y="100" width="250" height="150" rx="10" fill="#111827" stroke="#10b981" stroke-width="1.5" />
+  <rect x="675" y="115" width="220" height="26" rx="4" fill="#10b981" opacity="0.15" />
+  <text x="785" y="132" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#6ee7b7" text-anchor="middle">STAGE 3: DEDUPLICATION</text>
+  <text x="675" y="160" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#34d399">INSERT INTO webhook_events</text>
+  <text x="675" y="178" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">(gateway_name, gateway_event_id)</text>
+  <text x="675" y="196" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#cbd5e1">• Unique compound constraint</text>
+  <text x="675" y="214" font-family="Plus Jakarta Sans, sans-serif" font-size="9.5" fill="#fcd34d">• Duplicate delivery $\rightarrow$ Return 200 OK</text>
+  <text x="675" y="232" font-family="Plus Jakarta Sans, sans-serif" font-size="9" fill="#10b981">Zero double crediting</text>
+
+  <!-- Bottom Detailed Scenarios Table -->
+  <rect x="50" y="280" width="860" height="190" rx="12" fill="#0b1120" stroke="#334155" stroke-width="1.5" />
+  <text x="75" y="308" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="800" fill="#f8fafc">Edge-Case Resilience Matrix for Payment Gateway Webhooks</text>
+
+  <rect x="75" y="325" width="810" height="125" rx="6" fill="#030712" stroke="#1e293b" stroke-width="1" />
+  <text x="90" y="350" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#38bdf8">SCENARIO                     | ROOT CAUSE                           | PAYFLOW DEFENSE &amp; ACTION</text>
+  <text x="90" y="370" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#475569">-----------------------------+--------------------------------------+---------------------------------------------------</text>
+  <text x="90" y="390" font-family="JetBrains Mono, monospace" font-size="10" fill="#cbd5e1">1. Retried Duplicate Webhook | Gateway timeout on first 200 ACK     | Hit ON CONFLICT (gateway_event_id); no-op 200 OK</text>
+  <text x="90" y="410" font-family="JetBrains Mono, monospace" font-size="10" fill="#cbd5e1">2. Delayed Webhook Delivery  | Gateway internal processing backlog  | Idempotency check verifies current payment_intent state</text>
+  <text x="90" y="430" font-family="JetBrains Mono, monospace" font-size="10" fill="#cbd5e1">3. Altered Webhook Payload   | Man-in-the-middle / Tampering attempt| HMAC-SHA256 digest fails; rejected with 401</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="490" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="508" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    Fintech Rule: Never trust client redirects for payment confirmation; always process payments asynchronously via verified, deduplicated webhooks.
+  </text>
+</svg>

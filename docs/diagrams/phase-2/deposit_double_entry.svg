@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="p2Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0e1726" />
+    </linearGradient>
+    <linearGradient id="p2Card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <marker id="arr2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+    </marker>
+    <marker id="arr2Green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="560" fill="url(#p2Bg)" />
+
+  <text x="480" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#f8fafc" text-anchor="middle">Phase 2 Deposit Primitive &amp; Double-Entry Settlement Flow</text>
+  <text x="480" y="58" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" fill="#94a3b8" text-anchor="middle">Atomic ACID Transaction • Row Locks • Invariant Validation • Immutable Ledger Entry</text>
+
+  <!-- Actors Header -->
+  <!-- Actor 1: User -->
+  <rect x="50" y="85" width="110" height="36" rx="6" fill="url(#p2Card)" stroke="#38bdf8" stroke-width="1.2" />
+  <text x="105" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">Client (SPA)</text>
+  <line x1="105" y1="121" x2="105" y2="505" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Actor 2: Controller -->
+  <rect x="210" y="85" width="120" height="36" rx="6" fill="url(#p2Card)" stroke="#6366f1" stroke-width="1.2" />
+  <text x="270" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#818cf8" text-anchor="middle">WalletController</text>
+  <line x1="270" y1="121" x2="270" y2="505" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Actor 3: WalletService -->
+  <rect x="380" y="85" width="120" height="36" rx="6" fill="url(#p2Card)" stroke="#6366f1" stroke-width="1.2" />
+  <text x="440" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#818cf8" text-anchor="middle">WalletService</text>
+  <line x1="440" y1="121" x2="440" y2="505" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Actor 4: LedgerService -->
+  <rect x="550" y="85" width="120" height="36" rx="6" fill="url(#p2Card)" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="610" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#fcd34d" text-anchor="middle">LedgerService</text>
+  <line x1="610" y1="121" x2="610" y2="505" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Actor 5: PostgreSQL Database -->
+  <rect x="730" y="85" width="170" height="36" rx="6" fill="url(#p2Card)" stroke="#10b981" stroke-width="1.5" />
+  <text x="815" y="108" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="800" fill="#6ee7b7" text-anchor="middle">PostgreSQL 16 (Dedicated Client)</text>
+  <line x1="815" y1="121" x2="815" y2="505" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Step 1: POST /deposit -->
+  <line x1="105" y1="145" x2="260" y2="145" stroke="#6366f1" stroke-width="2" marker-end="url(#arr2)" />
+  <text x="180" y="138" font-family="JetBrains Mono, monospace" font-size="9" fill="#cbd5e1" text-anchor="middle">1. POST /wallets/me/deposit {amount: 100000}</text>
+
+  <!-- Step 2: Validate Zod -->
+  <line x1="270" y1="175" x2="430" y2="175" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr2)" />
+  <text x="350" y="168" font-family="JetBrains Mono, monospace" font-size="9" fill="#a5b4fc" text-anchor="middle">2. deposit(userId, 100000 paise)</text>
+
+  <!-- Step 3: BEGIN TX -->
+  <line x1="440" y1="205" x2="805" y2="205" stroke="#10b981" stroke-width="2" marker-end="url(#arr2Green)" />
+  <text x="625" y="198" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">3. BEGIN TRANSACTION (Read Committed)</text>
+
+  <!-- Step 4: SELECT FOR UPDATE -->
+  <line x1="440" y1="235" x2="805" y2="235" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr2Green)" />
+  <text x="625" y="228" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">4. SELECT * FROM wallets WHERE id IN (C, U) ORDER BY id ASC FOR UPDATE</text>
+
+  <!-- Step 5: Post Double-Entry -->
+  <line x1="440" y1="275" x2="600" y2="275" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr2)" />
+  <text x="520" y="268" font-family="JetBrains Mono, monospace" font-size="9" fill="#fcd34d" text-anchor="middle">5. postDoubleEntryTransaction(...)</text>
+
+  <!-- Invariant Check Box -->
+  <rect x="535" y="295" width="150" height="35" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+  <text x="610" y="310" font-family="Plus Jakarta Sans, sans-serif" font-size="9" font-weight="700" fill="#fcd34d" text-anchor="middle">Verify Accounting Invariant</text>
+  <text x="610" y="323" font-family="JetBrains Mono, monospace" font-size="8" fill="#34d399" text-anchor="middle">Σ Debits (1000) == Σ Credits (1000)</text>
+
+  <!-- Step 6: INSERT into transactions -->
+  <line x1="610" y1="345" x2="805" y2="345" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr2Green)" />
+  <text x="710" y="338" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">6. INSERT INTO transactions (ref_id, amount=100000, ...)</text>
+
+  <!-- Step 7: INSERT into ledger_entries -->
+  <line x1="610" y1="375" x2="805" y2="375" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr2Green)" />
+  <text x="710" y="368" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#34d399" text-anchor="middle">7. INSERT INTO ledger_entries: DEBIT Clearing, CREDIT User</text>
+
+  <!-- Step 8: UPDATE wallets cached balance -->
+  <line x1="440" y1="410" x2="805" y2="410" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr2Green)" />
+  <text x="625" y="403" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">8. UPDATE wallets SET balance = balance + 100000, version = version + 1</text>
+
+  <!-- Step 9: COMMIT -->
+  <line x1="440" y1="445" x2="805" y2="445" stroke="#10b981" stroke-width="2" marker-end="url(#arr2Green)" />
+  <text x="625" y="438" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">9. COMMIT TRANSACTION (Rollback on any failure)</text>
+
+  <!-- Step 10: Return 200 OK -->
+  <line x1="440" y1="475" x2="115" y2="475" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arr2Green)" />
+  <text x="270" y="468" font-family="JetBrains Mono, monospace" font-size="9" fill="#34d399" text-anchor="middle">10. 200 OK { referenceId, amount: 100000, newBalance: 100000 }</text>
+
+  <!-- Bottom Annotation -->
+  <rect x="50" y="515" width="860" height="28" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+  <text x="480" y="533" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">
+    All financial movements are atomic • Zero floating point • Mutex lock prevents lost updates • Immutable audit trail
+  </text>
+</svg>

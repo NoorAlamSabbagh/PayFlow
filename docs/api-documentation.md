@@ -70,14 +70,69 @@ Interactive Swagger OpenAPI 3.0 documentation is available at:
 | `POST` | `/transfers` | Initiate P2P transfer with row lock, double-entry ledger & idempotency | Bearer + Idempotency-Key |
 | `GET` | `/transfers/:referenceId` | Lookup transfer status by public reference ID | Bearer |
 
-### 2.4 Payments & Webhooks (`/payments`, `/webhooks`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/payments/intents` | Create top-up payment session with Mock Gateway | Bearer + Idempotency-Key |
-| `POST` | `/webhooks/gateway` | Inbound webhook from Mock Payment Gateway | HMAC-SHA256 Signature |
+### 2.4 Payments & Gateway Webhooks (`/payments`, `/webhooks`)
+| Method | Endpoint | Description | Auth Required | Idempotent |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/payments/intents` | Create payment intent and gateway order | Bearer JWT | Yes (`Idempotency-Key` header) |
+| `GET` | `/payments/:paymentIntentId` | Fetch status of specific payment intent | Bearer JWT (Ownership/Admin) | Yes |
+| `GET` | `/payments` | Paginated list of user's payment attempts | Bearer JWT | Yes |
+| `POST` | `/webhooks/payment-gateway` | Authoritative webhook receiver for payment gateways | Public (HMAC Signature Required) | Yes (`webhook_events` deduplication) |
+| `GET` | `/payments/admin/all` | View all platform payment intents across all users | Bearer JWT (`ADMIN` only) | Yes |
+| `POST` | `/payments/admin/:id/reconcile` | Audit reconciliation against gateway and ledger entries | Bearer JWT (`ADMIN` only) | Yes |
 
-### 2.5 Admin & Reconciliation (`/admin`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/admin/reconciliation` | Run on-demand ledger mathematical consistency check | Admin Bearer |
-| `POST` | `/admin/wallets/:id/freeze`| Freeze suspicious wallet for compliance review | Admin Bearer |
+#### Endpoint Specifications
+
+##### `POST /api/v1/payments/intents`
+- **Headers:** `Authorization: Bearer <token>`, `Idempotency-Key: <uuid>`
+- **Request Body:**
+  ```json
+  {
+    "amount": 100000,
+    "currency": "INR",
+    "provider": "MOCK_GATEWAY"
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "message": "Payment intent created successfully",
+    "data": {
+      "id": "intent-uuid",
+      "userId": "user-uuid",
+      "walletId": "wallet-uuid",
+      "amount": 100000,
+      "currency": "INR",
+      "provider": "MOCK_GATEWAY",
+      "gatewayOrderId": "order_mock_12345",
+      "gatewayPaymentId": null,
+      "status": "CREATED",
+      "errorMessage": null,
+      "createdAt": "2026-09-14T20:00:00.000Z",
+      "completedAt": null
+    }
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: Invalid amount (non-integer, <= 0), missing idempotency key.
+  - `409 Conflict`: `IDEMPOTENCY_PAYLOAD_MISMATCH` (reusing key with different amount), `IDEMPOTENCY_IN_PROGRESS`.
+
+##### `POST /api/v1/webhooks/payment-gateway`
+- **Headers:** `x-mock-signature: <hmac_hex>` or `x-razorpay-signature: <hmac_hex>`
+- **Request Body:** Raw gateway webhook JSON.
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Webhook event acknowledged and processed",
+    "data": {
+      "received": true,
+      "status": "SETTLED",
+      "transactionReference": "TXN_TOPUP_...",
+      "paymentIntentId": "intent-uuid"
+    }
+  }
+  ```
+- **Error Responses:**
+  - `401 Unauthorized`: `INVALID_WEBHOOK_SIGNATURE` (HMAC verification failed). Zero DB mutations.
+

@@ -24,10 +24,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', active: true },
-    { name: 'Wallet', icon: Wallet, path: '#', comingSoon: 'Phase 2' },
-    { name: 'Transfers', icon: ArrowLeftRight, path: '#', comingSoon: 'Phase 3' },
+    { name: 'Wallet', icon: Wallet, path: '/wallet', active: true },
+    { name: 'Transfers', icon: ArrowLeftRight, path: '/transfers', active: true },
     { name: 'Payments', icon: CreditCard, path: '#', comingSoon: 'Phase 4' },
-    { name: 'Transactions', icon: ReceiptText, path: '#', comingSoon: 'Phase 2' },
+    { name: 'Ledger Audit', icon: ReceiptText, path: '/wallet', active: true },
     { name: 'Risk & Security', icon: ShieldAlert, path: '#', comingSoon: 'Phase 6' },
   ];
 

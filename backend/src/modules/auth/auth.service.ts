@@ -10,10 +10,13 @@ import { config } from '../../config';
 import { logger } from '../../config/logger';
 import { getClient } from '../../database';
 
+import { walletRepository, WalletRepository } from '../wallet/wallet.repository';
+
 export class AuthService {
   constructor(
     private userRepo: UserRepository = userRepository,
-    private tokenRepo: RefreshTokenRepository = refreshTokenRepository
+    private tokenRepo: RefreshTokenRepository = refreshTokenRepository,
+    private walletRepo: WalletRepository = walletRepository
   ) {}
 
   /**
@@ -28,16 +31,51 @@ export class AuthService {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(input.password, saltRounds);
 
-    const user = await this.userRepo.createUser({
-      email: input.email,
-      passwordHash,
-      fullName: input.fullName,
-      role: input.role,
-    });
+    // Atomically create user and provision their default USER wallet
+    const client = await getClient();
+    let user;
+    try {
+      await client.query('BEGIN');
+
+      user = await this.userRepo.createUser(
+        {
+          email: input.email,
+          passwordHash,
+          fullName: input.fullName,
+          role: input.role,
+        },
+        client
+      );
+
+      await this.walletRepo.createWallet(
+        {
+          userId: user.id,
+          type: 'USER',
+          currency: 'INR',
+          initialBalance: 0n,
+          status: 'ACTIVE',
+        },
+        client
+      );
+
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      logger.error('Failed to atomically register user and provision wallet', {
+        email: input.email,
+        error: (err as Error).message,
+      });
+      throw err;
+    } finally {
+      client.release();
+    }
 
     const tokens = await this.issueTokenPair(user.id, user.email, user.role, uuidv4());
 
-    logger.info('User successfully registered', { userId: user.id, role: user.role });
+    logger.info('User successfully registered and wallet provisioned', {
+      userId: user.id,
+      role: user.role,
+    });
 
     return {
       user: toUserResponseDto(user),

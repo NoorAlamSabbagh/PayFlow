@@ -48,29 +48,52 @@ Enforced using reusable `requireRole('ADMIN')` middleware guards. A regular user
 
 ---
 
-## 3. Webhook Security (HMAC-SHA256 & Timestamp Verification)
+## 3. Webhook Security (HMAC-SHA256 & Timing-Safe Verification)
 
-Incoming payment gateway webhooks must be protected against tampering and replay attacks:
-1. **Signature Header:** Every webhook arrives with `X-PayFlow-Signature: t=1773489600,v1=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08`.
-2. **Replay Window:** The server rejects any webhook whose timestamp `t` deviates by more than 300 seconds (5 minutes) from server clock.
-3. **Payload Signature Verification:**
+Incoming payment gateway webhooks must be protected against forgery, payload tampering, and replay attacks:
+1. **Raw Body Buffer Preservation:**
+   To prevent JSON re-serialization hash mismatch (due to key reordering, whitespace, or Unicode discrepancies), Express is configured with a raw body capture verify callback in `src/app.ts`:
+   ```typescript
+   app.use(express.json({
+     limit: '1mb',
+     verify: (req: any, _res, buf) => {
+       req.rawBody = buf; // Preserve exact unmodified buffer
+     }
+   }));
+   ```
+2. **Cryptographic HMAC-SHA256 Signature Computation:**
+   The gateway signs the raw request payload with the shared secret:
    ```typescript
    const expectedSignature = crypto
-     .createHmac('sha256', process.env.MOCK_GATEWAY_WEBHOOK_SECRET!)
-     .update(`${timestamp}.${rawBody}`)
+     .createHmac('sha256', secret)
+     .update(rawBody)
      .digest('hex');
-   
-   // Constant-time comparison prevents timing attacks
-   const isValid = crypto.timingSafeEqual(
-     Buffer.from(signature),
-     Buffer.from(expectedSignature)
-   );
    ```
+3. **Timing-Safe Equality Comparison:**
+   Standard string comparison (`===`) terminates on the first non-matching byte, leaking timing information to attackers. PayFlow compares signature byte buffers in constant time using `crypto.timingSafeEqual`:
+   ```typescript
+   const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+   const actualBuffer = Buffer.from(signature, 'utf8');
+   if (expectedBuffer.length !== actualBuffer.length) return false;
+   return crypto.timingSafeEqual(expectedBuffer, actualBuffer);
+   ```
+4. **Ingress Deduplication Table (`webhook_events`):**
+   External event IDs (`gateway_event_id`) are unique per provider. Repeated deliveries return an HTTP 200 acknowledgment without re-running financial logic.
 
 ---
 
-## 4. Input Sanitization & Defense-in-Depth
+## 4. Financial Non-Negotiable: Authoritative Server-Side Confirmation
+
+1. **Client Never Confirms Payment:**
+   The frontend browser is treated as an untrusted public environment. Client-side callbacks or checkout completion redirects only trigger a status polling indicator ("Payment verification in progress...").
+2. **Authoritative Webhook Settlement:**
+   A wallet is credited and double-entry ledger records are posted **only** when the server successfully verifies the external gateway's cryptographic webhook.
+
+---
+
+## 5. Input Sanitization & Defense-in-Depth
 
 - **Zero SQL Injection Risk:** All database access is conducted through parameterized queries (`$1, $2, ...`). Dynamic raw string concatenation in SQL queries is strictly prohibited.
 - **Zod Schema Validation:** All inbound HTTP request parameters, query strings, and JSON request bodies are parsed through strict Zod schemas that strip unknown fields.
+- **Integer Money Invariant:** Floats and decimals are rejected at the routing boundary. All monetary values are represented strictly as integers in smallest currency units (paise/cents).
 - **HTTP Security Headers:** Integrated `helmet` middleware setting strict Content Security Policy (CSP), HSTS, and X-Content-Type-Options.

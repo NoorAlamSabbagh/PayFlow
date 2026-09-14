@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
 import { api } from '../../api/client';
+import { walletService } from '../wallet/walletService';
+import { WalletData } from '../wallet/walletTypes';
 import {
   Wallet,
   ArrowUpRight,
@@ -23,12 +26,22 @@ interface AdminUserData {
 }
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { user, accessToken } = useSelector((state: RootState) => state.auth);
 
+  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const [walletLoading, setWalletLoading] = useState<boolean>(true);
   const [adminTestResult, setAdminTestResult] = useState<string | null>(null);
   const [adminTestStatus, setAdminTestStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshSuccessMessage, setRefreshSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    walletService.getMyWallet()
+      .then(setWallet)
+      .catch(() => {})
+      .finally(() => setWalletLoading(false));
+  }, []);
 
   const handleTestAdminRoute = async () => {
     setAdminTestStatus('idle');
@@ -110,22 +123,22 @@ export const Dashboard: React.FC = () => {
 
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
               <span className="financial-amount" style={{ fontSize: '2.75rem', color: 'white' }}>
-                ₹0.00
+                {walletLoading ? '...' : (wallet?.formattedBalance || '₹0.00')}
               </span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                (0 paise)
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                ({walletLoading ? '...' : (wallet?.balance?.toLocaleString('en-IN') || '0')} paise)
               </span>
             </div>
 
             <p style={{ fontSize: '0.775rem', color: '#818cf8', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Sparkles size={14} /> Double-entry ledger integration activates in Phase 2
+              <Sparkles size={14} /> Real-time double-entry settlement engine active
             </p>
           </div>
 
           {/* Quick Action Triggers */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
             <button
-              onClick={() => alert('Add Money deposit workflow will connect to the Mock Gateway in Phase 2 & 4.')}
+              onClick={() => navigate('/wallet')}
               className="btn btn-primary"
               style={{ gap: '0.45rem' }}
             >
@@ -134,7 +147,7 @@ export const Dashboard: React.FC = () => {
             </button>
 
             <button
-              onClick={() => alert('Peer-to-Peer Wallet Transfer engine will activate in Phase 3.')}
+              onClick={() => navigate('/transfers')}
               className="btn btn-secondary"
               style={{ gap: '0.45rem' }}
             >
@@ -143,7 +156,7 @@ export const Dashboard: React.FC = () => {
             </button>
 
             <button
-              onClick={() => alert('Audit Ledger & statement export will connect in Phase 2.')}
+              onClick={() => navigate('/wallet')}
               className="btn btn-secondary"
               style={{ gap: '0.45rem' }}
             >

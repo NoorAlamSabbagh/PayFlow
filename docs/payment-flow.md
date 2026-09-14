@@ -122,6 +122,24 @@ sequenceDiagram
     API-->>PG: 200 OK
 ```
 
+### 2.1 Phase 2 Internal Deposit Primitive (Double-Entry Settlement)
+In Phase 2, the core double-entry accounting engine is established prior to connecting external gateway adapters:
+1. **Client Request:** Authenticated user invokes `POST /api/v1/wallets/me/deposit` with `{ amount: 100000 }` (₹1,000.00).
+2. **Validation:** Zod validates that `amount` is a strictly positive integer representing smallest currency unit (paise). Decimals and negative numbers are rejected.
+3. **Pessimistic Lock:** Dedicated PostgreSQL client initiates transaction and acquires exclusive row locks on `SYSTEM_GATEWAY_CLEARING` and the user's `USER` wallet ordered by UUID:
+   ```sql
+   SELECT * FROM wallets WHERE id = ANY($1::uuid[]) ORDER BY id ASC FOR UPDATE;
+   ```
+4. **Double-Entry Balance Verification:**
+   - DEBIT: `SYSTEM_GATEWAY_CLEARING` ₹1,000
+   - CREDIT: User Wallet ₹1,000
+   - $\sum \text{Debits} == \sum \text{Credits} == \text{Amount}$ verified by `LedgerService`.
+5. **Atomic Commit:**
+   - Transaction record written to `transactions`.
+   - Immutable records written to `ledger_entries` (protected by immutability trigger).
+   - Cached balances updated in `wallets`.
+   - Transaction commits. On any failure, complete rollback occurs.
+
 ---
 
 ## 3. Transaction State Machine & Life Cycle
@@ -138,6 +156,104 @@ sequenceDiagram
                     |
               (Refund Flow)
                     |
-                    v
-              [ REVERSED ]
+                                  [ REVERSED ]
+```
+
+---
+
+## 4. Phase 4: External Payment Gateway Funding & Webhook Settlement
+
+### 4.1 Wallet Funding Lifecycle Sequence
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Browser
+    participant API as PayFlow Core API
+    participant Gateway as External Gateway (Razorpay/Mock)
+    participant DB as PostgreSQL 16 (Neon)
+
+    Note over User,API: 1. Payment Intent Initiation
+    User->>API: POST /api/v1/payments/intents (Idempotency-Key)
+    API->>API: Check Dual-Layer Idempotency (Redis L1 / Postgres L2)
+    API->>Gateway: createOrder({ amount, currency, receipt })
+    Gateway-->>API: { providerOrderId: "order_123", amount: 100000 }
+    API->>DB: INSERT INTO payment_intents (status='CREATED')
+    API-->>User: 201 Created (Wallet balance UNCHANGED)
+
+    Note over User,Gateway: 2. Checkout
+    User->>Gateway: Submits Card / Payment Credentials
+    Gateway-->>User: "Payment Submitted"
+
+    Note over Gateway,DB: 3. Authoritative Webhook Callback
+    Gateway->>API: POST /api/v1/webhooks/payment-gateway (x-signature)
+    API->>API: HMAC-SHA256 Timing-Safe Verification (req.rawBody)
+    alt Invalid Signature
+        API-->>Gateway: 401 Unauthorized (Rejected)
+    else Valid Signature
+        API->>DB: Deduplicate (webhook_events)
+        alt Duplicate Event ID
+            API-->>Gateway: 200 OK (ALREADY_PROCESSED)
+        else Fresh Event
+            API->>DB: BEGIN Transaction
+            API->>DB: SELECT payment_intents FOR UPDATE
+            API->>DB: SELECT wallets FOR UPDATE (User + System Clearing)
+            API->>DB: UPDATE wallets SET balance = balance + 100000 (User)
+            API->>DB: UPDATE wallets SET balance = balance - 100000 (Clearing)
+            API->>DB: INSERT INTO transactions (type='TOPUP', status='COMPLETED')
+            API->>DB: INSERT INTO ledger_entries (DEBIT Clearing, CREDIT User)
+            API->>DB: INSERT INTO outbox_events (PAYMENT_SUCCEEDED)
+            API->>DB: UPDATE payment_intents SET status='SUCCESS'
+            API->>DB: UPDATE webhook_events SET is_processed=true
+            API->>DB: COMMIT Transaction
+            API-->>Gateway: 200 OK
+        end
+    end
+
+    Note over User,API: 4. Authoritative Verification Polling
+    loop Every 1.5s until SUCCESS
+        User->>API: GET /api/v1/payments/:id
+        API-->>User: { status: 'SUCCESS', transactionReference: 'TXN_TOPUP_...' }
+    end
+    User->>User: Renders Verified Receipt & Refreshes Wallet Balance
+```
+
+### 4.2 Webhook Deduplication & Replay Protection Sequence
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Gateway as Payment Processor
+    participant API as Webhook Receiver
+    participant DB as PostgreSQL 16
+
+    Gateway->>API: Delivery #1: payment.captured (Event ID: evt_999)
+    API->>API: Verify HMAC Signature (Valid)
+    API->>DB: INSERT INTO webhook_events (evt_999, is_processed=false)
+    API->>DB: Settle Intent, Credit Wallet, Write Ledger
+    API->>DB: UPDATE webhook_events SET is_processed=true
+    API-->>Gateway: 200 OK (SETTLED)
+
+    Note over Gateway,API: Network Hiccup / Gateway Retries Event
+    Gateway->>API: Delivery #2 (Retry): payment.captured (Event ID: evt_999)
+    API->>API: Verify HMAC Signature (Valid)
+    API->>DB: SELECT * FROM webhook_events WHERE gateway_event_id = 'evt_999'
+    DB-->>API: Found record with is_processed = true
+    API-->>Gateway: 200 OK (ALREADY_PROCESSED)
+    Note over API,DB: ZERO Ledger or Wallet Mutations!
+```
+
+### 4.3 Failed & Cancelled Payment Flow
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Gateway as Payment Processor
+    participant API as Webhook Receiver
+    participant DB as PostgreSQL 16
+
+    Gateway->>API: payment.failed (Event ID: evt_fail_001, error_description: "Card declined")
+    API->>API: Verify HMAC Signature (Valid)
+    API->>DB: INSERT INTO webhook_events (evt_fail_001)
+    API->>DB: UPDATE payment_intents SET status='FAILED', error_message='Card declined'
+    API->>DB: UPDATE webhook_events SET is_processed=true
+    API-->>Gateway: 200 OK (MARKED_FAILED)
+    Note over DB: Wallet balance strictly unchanged. No ledger entries created.
 ```
