@@ -148,7 +148,7 @@ export class LedgerService {
           maximumFractionDigits: 2,
         })}`,
         description: row.description,
-        createdAt: row.created_at.toISOString(),
+        createdAt: new Date(row.created_at).toISOString(),
       };
     });
 
