@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PayFlow API - Digital Wallet & Payment Processing Platform",
+    "version": "1.0.0",
+    "description": "Production-grade fintech REST API documenting Phase 1: Authentication, Users, RBAC, and Token Rotation."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Short-lived stateless JWT access token (15m expiration)"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "fullName": { "type": "string" },
+          "role": { "type": "string", "enum": ["USER", "ADMIN", "OPERATOR"] },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AuthSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "User logged in successfully" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": { "$ref": "#/components/schemas/User" },
+              "accessToken": { "type": "string", "example": "eyJhbGciOi..." }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "Invalid email or password" },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "example": "INVALID_CREDENTIALS" },
+              "details": { "type": "object" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "fullName"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "fullName": { "type": "string", "minLength": 2 },
+                  "role": { "type": "string", "enum": ["USER", "ADMIN"], "default": "USER" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly refresh token cookie",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthSuccessResponse" }
+              }
+            }
+          },
+          "400": { "description": "Validation Error" },
+          "409": { "description": "Email already exists" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate user credentials",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly refresh token cookie",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthSuccessResponse" }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Rotate refresh token and issue new access token",
+        "tags": ["Authentication"],
+        "description": "Automatically validates rotation, detects replay attacks, and revokes compromised token families.",
+        "responses": {
+          "200": { "description": "New access token and rotated refresh cookie returned" },
+          "401": { "description": "Token expired or compromised family detected" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Revoke active refresh token and clear cookie",
+        "tags": ["Authentication"],
+        "responses": {
+          "200": { "description": "Logged out cleanly" }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Fetch current authenticated user profile",
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Authentication required" }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List all users (ADMIN role only)",
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User list for admin audit" },
+          "403": { "description": "Forbidden - Admin role required" }
+        }
+      }
+    }
+  }
+}
