@@ -24,11 +24,15 @@ import {
   CounterpartyOption,
 } from './transferTypes';
 import { WalletData } from '../wallet/walletTypes';
+import { useToast } from '../../components/ToastContext';
+import { Skeleton } from '../../components/Skeleton';
 
 export const TransferView: React.FC = () => {
+  const { toast } = useToast();
   // Wallet balance state
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [loadingWallet, setLoadingWallet] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   // Counterparty options state
   const [counterparties, setCounterparties] = useState<CounterpartyOption[]>([]);
@@ -107,21 +111,25 @@ export const TransferView: React.FC = () => {
 
     const parsedRupees = parseFloat(rupeeAmount);
     if (isNaN(parsedRupees) || parsedRupees <= 0) {
-      setErrorMsg('Please enter a valid transfer amount greater than ₹0.00');
+      const msg = 'Please enter a valid transfer amount greater than ₹0.00';
+      setErrorMsg(msg);
+      toast.warning(msg, 'Invalid Amount');
       return;
     }
 
     const amountPaise = Math.round(parsedRupees * 100);
 
     if (!selectedRecipientId) {
-      setErrorMsg('Please select a valid recipient for this transfer');
+      const msg = 'Please select a valid recipient for this transfer';
+      setErrorMsg(msg);
+      toast.warning(msg, 'Recipient Required');
       return;
     }
 
     if (wallet && amountPaise > wallet.balance) {
-      setErrorMsg(
-        `Insufficient balance! Your available balance is ${wallet.formattedBalance}, but you entered ₹${parsedRupees.toFixed(2)}`
-      );
+      const msg = `Insufficient balance! Your available balance is ${wallet.formattedBalance}, but you entered ₹${parsedRupees.toFixed(2)}`;
+      setErrorMsg(msg);
+      toast.error(msg, 'Insufficient Funds');
       return;
     }
 
@@ -144,12 +152,18 @@ export const TransferView: React.FC = () => {
       setRupeeAmount('');
       setDescription('P2P Transfer');
 
+      toast.success(
+        `Transferred ₹${parsedRupees.toLocaleString('en-IN')} to ${receipt.recipientName || 'recipient'} successfully!`,
+        'Transfer Completed'
+      );
+
       // Refresh wallet balance and transactions timeline
       await Promise.all([loadWallet(), loadTransactions(1)]);
     } catch (err: unknown) {
       const errorResponse = err as { response?: { data?: { message?: string } } };
       const message = errorResponse?.response?.data?.message || 'Transfer failed. Please check balance and try again.';
       setErrorMsg(message);
+      toast.error(message, 'Transfer Failed');
     } finally {
       setSubmitting(false);
     }
@@ -189,14 +203,22 @@ export const TransferView: React.FC = () => {
         </div>
 
         <button
-          onClick={() => {
-            loadWallet();
-            loadTransactions(page);
+          onClick={async () => {
+            setRefreshing(true);
+            try {
+              await Promise.all([loadWallet(), loadTransactions(page)]);
+              toast.success('Wallet balance & transaction history refreshed', 'Sync Complete');
+            } catch {
+              toast.error('Failed to refresh data', 'Sync Failed');
+            } finally {
+              setRefreshing(false);
+            }
           }}
+          disabled={refreshing || loadingWallet || loadingHistory}
           className="btn-secondary"
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.85rem', fontSize: '0.85rem' }}
         >
-          <RefreshCw size={15} className={loadingHistory || loadingWallet ? 'animate-spin' : ''} />
+          <RefreshCw size={15} className={refreshing ? 'spinner spinner-sm' : ''} />
           <span>Refresh</span>
         </button>
       </div>
@@ -217,8 +239,12 @@ export const TransferView: React.FC = () => {
           </div>
 
           <div>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', letterSpacing: '-0.03em' }}>
-              {loadingWallet ? '...' : (wallet?.formattedBalance || '₹0.00')}
+            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', letterSpacing: '-0.03em', minHeight: '2.5rem', display: 'flex', alignItems: 'center' }}>
+              {loadingWallet && !wallet ? (
+                <Skeleton width="180px" height="2.25rem" />
+              ) : (
+                wallet?.formattedBalance || '₹0.00'
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
@@ -517,9 +543,34 @@ export const TransferView: React.FC = () => {
 
           {/* Transactions List */}
           {loadingHistory ? (
-            <div style={{ padding: '3rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <RefreshCw size={24} className="animate-spin" style={{ margin: '0 auto 0.75rem auto' }} />
-              <p style={{ fontSize: '0.85rem' }}>Loading transaction records...</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div
+                  key={`skel-tx-${idx}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.85rem 1rem',
+                    backgroundColor: 'var(--bg-surface)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-subtle)',
+                    gap: '0.75rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                    <Skeleton width="34px" height="34px" borderRadius="var(--radius-sm)" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
+                      <Skeleton width="45%" height="0.9rem" />
+                      <Skeleton width="30%" height="0.75rem" />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
+                    <Skeleton width="70px" height="1.1rem" />
+                    <Skeleton width="50px" height="0.7rem" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : transactions.length === 0 ? (
             <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>

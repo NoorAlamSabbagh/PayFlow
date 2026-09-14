@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { registerUser, clearError } from './authSlice';
+import { useToast } from '../../components/ToastContext';
 import {
   User as UserIcon,
   Mail,
@@ -28,6 +29,7 @@ export const Register: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { status, error } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +37,11 @@ export const Register: React.FC = () => {
     dispatch(clearError());
     const result = await dispatch(registerUser({ fullName, email, password, role }));
     if (registerUser.fulfilled.match(result)) {
+      toast.success('Account created & wallet initialized successfully!', 'Welcome to PayFlow');
       navigate('/dashboard');
+    } else if (registerUser.rejected.match(result)) {
+      const errorMsg = (result.payload as string) || 'Failed to create account';
+      toast.error(errorMsg, 'Registration Error');
     }
   };
 

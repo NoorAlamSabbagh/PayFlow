@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { loginUser, clearError } from './authSlice';
+import { useToast } from '../../components/ToastContext';
 import {
   Lock,
   Mail,
@@ -24,6 +25,7 @@ export const Login: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { status, error } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +33,11 @@ export const Login: React.FC = () => {
     dispatch(clearError());
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
+      toast.success(`Welcome back, ${result.payload.user.fullName}!`, 'Authentication Successful');
       navigate('/dashboard');
+    } else if (loginUser.rejected.match(result)) {
+      const errorMsg = (result.payload as string) || 'Invalid email or password';
+      toast.error(errorMsg, 'Login Failed');
     }
   };
 

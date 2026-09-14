@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Wallet,
   ArrowUpRight,
@@ -15,8 +16,12 @@ import {
 import { walletService } from './walletService';
 import { WalletData, LedgerEntry } from './walletTypes';
 import { AddMoneyModal } from '../payment/AddMoneyModal';
+import { useToast } from '../../components/ToastContext';
+import { SkeletonWalletCard, SkeletonTableRows } from '../../components/Skeleton';
 
 export const WalletView: React.FC = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
@@ -41,15 +46,22 @@ export const WalletView: React.FC = () => {
       setWallet(walletData);
       setLedgerEntries(ledgerData.entries);
       setPagination(ledgerData.pagination);
+
+      if (showRefreshSpinner) {
+        toast.success('Wallet balance & ledger entries synchronized with PostgreSQL', 'Sync Complete');
+      }
     } catch (err: unknown) {
       const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
         'Failed to load wallet data. Please check your connection.';
       setError(errorMsg);
+      if (showRefreshSpinner) {
+        toast.error(errorMsg, 'Sync Failed');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadData(1);
@@ -112,74 +124,79 @@ export const WalletView: React.FC = () => {
       )}
 
       {/* Hero Balance Card */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(26, 36, 54, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%)',
-        border: '1px solid var(--border-medium)',
-        borderRadius: 'var(--radius-xl)',
-        padding: '2rem',
-        marginBottom: '2rem',
-        position: 'relative',
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-card)'
-      }}>
-        {/* Decorative backdrop glow */}
-        <div style={{
-          position: 'absolute',
-          top: '-30px',
-          right: '-30px',
-          width: '240px',
-          height: '240px',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', position: 'relative' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-              <span className="badge badge-primary">Primary Wallet</span>
-              <span className="badge badge-success">
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
-                {wallet?.status || 'ACTIVE'}
-              </span>
-              <span className="badge badge-neutral">{wallet?.currency || 'INR'}</span>
-            </div>
-
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Available Balance
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
-              <h2 className="financial-amount" style={{ fontSize: '2.5rem', color: 'var(--text-primary)' }}>
-                {loading ? '...' : (wallet?.formattedBalance || '₹0.00')}
-              </h2>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontFamily: 'var(--font-mono)' }}>
-                ({loading ? '...' : (wallet?.balance?.toLocaleString('en-IN') || '0')} paise)
-              </span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button
-              onClick={() => setIsDepositModalOpen(true)}
-              className="btn btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem' }}
-            >
-              <Plus size={18} />
-              <span>+ Add Money</span>
-            </button>
-
-            <button
-              disabled
-              className="btn btn-secondary"
-              title="P2P Transfers are scheduled for Phase 3"
-              style={{ opacity: 0.6, cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              <ArrowUpRight size={18} />
-              <span>Transfer</span>
-              <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.35rem', borderRadius: '4px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>Phase 3</span>
-            </button>
-          </div>
+      {loading && !wallet ? (
+        <div style={{ marginBottom: '2rem' }}>
+          <SkeletonWalletCard />
         </div>
+      ) : (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(26, 36, 54, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: 'var(--radius-xl)',
+          padding: '2rem',
+          marginBottom: '2rem',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: 'var(--shadow-card)'
+        }}>
+          {/* Decorative backdrop glow */}
+          <div style={{
+            position: 'absolute',
+            top: '-30px',
+            right: '-30px',
+            width: '240px',
+            height: '240px',
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', position: 'relative' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                <span className="badge badge-primary">Primary Wallet</span>
+                <span className="badge badge-success">
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
+                  {wallet?.status || 'ACTIVE'}
+                </span>
+                <span className="badge badge-neutral">{wallet?.currency || 'INR'}</span>
+              </div>
+
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Available Balance
+              </p>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
+                <h2 className="financial-amount" style={{ fontSize: '2.5rem', color: 'var(--text-primary)' }}>
+                  {wallet?.formattedBalance || '₹0.00'}
+                </h2>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontFamily: 'var(--font-mono)' }}>
+                  ({wallet?.balance?.toLocaleString('en-IN') || '0'} paise)
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setIsDepositModalOpen(true)}
+                className="btn btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem' }}
+                id="btn-add-money-hero"
+              >
+                <Plus size={18} />
+                <span>+ Add Money</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/transfers')}
+                className="btn btn-secondary"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem' }}
+                id="btn-transfer-hero"
+              >
+                <ArrowUpRight size={18} />
+                <span>Send Money</span>
+              </button>
+            </div>
+          </div>
 
         {/* Technical Accounting Spec Row */}
         <div style={{
@@ -221,6 +238,7 @@ export const WalletView: React.FC = () => {
           </div>
         </div>
       </div>
+    )}
 
       {/* Ledger History Section */}
       <div className="card">
@@ -237,9 +255,22 @@ export const WalletView: React.FC = () => {
         </div>
 
         {loading ? (
-          <div style={{ padding: '3rem 0', textAlign: 'center' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Loading immutable ledger records...</p>
+          <div className="table-container">
+            <table className="fin-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Reference ID</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th style={{ textAlign: 'right' }}>Amount</th>
+                  <th style={{ textAlign: 'right' }}>Balance After</th>
+                </tr>
+              </thead>
+              <tbody>
+                <SkeletonTableRows rows={6} cols={6} />
+              </tbody>
+            </table>
           </div>
         ) : ledgerEntries.length === 0 ? (
           <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center', border: '1px dashed var(--border-subtle)', borderRadius: 'var(--radius-md)' }}>

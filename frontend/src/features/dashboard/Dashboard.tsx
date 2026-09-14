@@ -5,6 +5,8 @@ import { RootState } from '../../store';
 import { api } from '../../api/client';
 import { walletService } from '../wallet/walletService';
 import { WalletData } from '../wallet/walletTypes';
+import { useToast } from '../../components/ToastContext';
+import { Skeleton } from '../../components/Skeleton';
 import {
   Wallet,
   ArrowUpRight,
@@ -28,40 +30,46 @@ interface AdminUserData {
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, accessToken } = useSelector((state: RootState) => state.auth);
+  const { toast } = useToast();
 
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [walletLoading, setWalletLoading] = useState<boolean>(true);
   const [adminTestResult, setAdminTestResult] = useState<string | null>(null);
   const [adminTestStatus, setAdminTestStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [adminTesting, setAdminTesting] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshSuccessMessage, setRefreshSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     walletService.getMyWallet()
       .then(setWallet)
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Failed to load wallet:', err);
+      })
       .finally(() => setWalletLoading(false));
   }, []);
 
   const handleTestAdminRoute = async () => {
     setAdminTestStatus('idle');
     setAdminTestResult(null);
+    setAdminTesting(true);
     try {
       const res = await api.get<{ data: AdminUserData[] }>('/users');
       setAdminTestStatus('success');
-      setAdminTestResult(
-        `RBAC Authorization Succeeded: Retrieved ${res.data.data.length} registered system users from GET /api/v1/users`
-      );
+      const msg = `RBAC Authorization Succeeded: Retrieved ${res.data.data.length} registered system users from GET /api/v1/users`;
+      setAdminTestResult(msg);
+      toast.success(msg, 'Admin Guard Verified');
     } catch (err: unknown) {
       setAdminTestStatus('error');
+      let msg = 'Failed to access admin endpoint';
       if (typeof err === 'object' && err !== null && 'response' in err) {
         const axErr = err as { response?: { status: number; data?: { message?: string } } };
-        setAdminTestResult(
-          `HTTP ${axErr.response?.status} - ${axErr.response?.data?.message || 'Access Denied: Insufficient Role Permissions'}`
-        );
-      } else {
-        setAdminTestResult('Failed to access admin endpoint');
+        msg = `HTTP ${axErr.response?.status} - ${axErr.response?.data?.message || 'Access Denied: Insufficient Role Permissions'}`;
       }
+      setAdminTestResult(msg);
+      toast.error(msg, 'RBAC Access Denied');
+    } finally {
+      setAdminTesting(false);
     }
   };
 
@@ -70,9 +78,13 @@ export const Dashboard: React.FC = () => {
     setRefreshSuccessMessage(null);
     try {
       await api.post('/auth/refresh');
-      setRefreshSuccessMessage('Access token refreshed & refresh cookie rotated successfully!');
+      const msg = 'Access token refreshed & refresh cookie rotated successfully!';
+      setRefreshSuccessMessage(msg);
+      toast.success(msg, 'Session Rotated');
     } catch {
-      setRefreshSuccessMessage('Token refresh failed');
+      const errMsg = 'Token refresh failed or session expired';
+      setRefreshSuccessMessage(errMsg);
+      toast.error(errMsg, 'Rotation Failed');
     } finally {
       setIsRefreshing(false);
     }
@@ -121,13 +133,22 @@ export const Dashboard: React.FC = () => {
               <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>INR (₹)</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-              <span className="financial-amount" style={{ fontSize: '2.75rem', color: 'white' }}>
-                {walletLoading ? '...' : (wallet?.formattedBalance || '₹0.00')}
-              </span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                ({walletLoading ? '...' : (wallet?.balance?.toLocaleString('en-IN') || '0')} paise)
-              </span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', minHeight: '3.5rem' }}>
+              {walletLoading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.25rem' }}>
+                  <Skeleton width="220px" height="2.75rem" borderRadius="var(--radius-md)" />
+                  <Skeleton width="130px" height="0.875rem" />
+                </div>
+              ) : (
+                <>
+                  <span className="financial-amount" style={{ fontSize: '2.75rem', color: 'white' }}>
+                    {wallet?.formattedBalance || '₹0.00'}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    ({wallet?.balance?.toLocaleString('en-IN') || '0'} paise)
+                  </span>
+                </>
+              )}
             </div>
 
             <p style={{ fontSize: '0.775rem', color: '#818cf8', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -339,9 +360,18 @@ export const Dashboard: React.FC = () => {
             <button
               id="test-rbac-btn"
               onClick={handleTestAdminRoute}
+              disabled={adminTesting}
               className="btn btn-primary btn-sm"
+              style={{ minWidth: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem' }}
             >
-              Test Admin Guard
+              {adminTesting ? (
+                <>
+                  <div className="spinner spinner-sm"></div>
+                  <span>Verifying...</span>
+                </>
+              ) : (
+                <span>Test Admin Guard</span>
+              )}
             </button>
           </div>
 

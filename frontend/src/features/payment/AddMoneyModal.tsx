@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { paymentService } from './paymentService';
 import { PaymentIntentData } from './paymentTypes';
+import { useToast } from '../../components/ToastContext';
 
 interface AddMoneyModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AddMoneyModalProps {
 type Step = 'AMOUNT_INPUT' | 'CHECKOUT' | 'VERIFYING' | 'SUCCESS' | 'FAILED';
 
 export const AddMoneyModal: React.FC<AddMoneyModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const { toast } = useToast();
   const [step, setStep] = useState<Step>('AMOUNT_INPUT');
   const [amountRupees, setAmountRupees] = useState<string>('1000');
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,12 +37,16 @@ export const AddMoneyModal: React.FC<AddMoneyModalProps> = ({ isOpen, onClose, o
 
     const parsedRupees = parseFloat(amountRupees);
     if (isNaN(parsedRupees) || parsedRupees <= 0) {
-      setError('Please enter a valid deposit amount greater than ₹0.');
+      const msg = 'Please enter a valid deposit amount greater than ₹0.';
+      setError(msg);
+      toast.warning(msg, 'Invalid Amount');
       return;
     }
 
     if (parsedRupees > 100000) {
-      setError('Maximum deposit allowed per transaction is ₹1,00,000.');
+      const msg = 'Maximum deposit allowed per transaction is ₹1,00,000.';
+      setError(msg);
+      toast.warning(msg, 'Amount Exceeds Limit');
       return;
     }
 
@@ -57,10 +63,11 @@ export const AddMoneyModal: React.FC<AddMoneyModalProps> = ({ isOpen, onClose, o
       );
       setIntent(createdIntent);
       setStep('CHECKOUT');
+      toast.info(`Payment intent created for ₹${parsedRupees.toLocaleString('en-IN')}`, 'Gateway Session Ready');
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Failed to initialize payment order. Please try again.'
-      );
+      const errMsg = err.response?.data?.message || 'Failed to initialize payment order. Please try again.';
+      setError(errMsg);
+      toast.error(errMsg, 'Checkout Initialization Failed');
     } finally {
       setLoading(false);
     }
@@ -81,13 +88,20 @@ export const AddMoneyModal: React.FC<AddMoneyModalProps> = ({ isOpen, onClose, o
         if (latest.status === 'SUCCESS') {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setStep('SUCCESS');
+          toast.success(
+            `₹${(latest.amount / 100).toLocaleString('en-IN')} deposited to your wallet via verified webhook!`,
+            'Payment Settled'
+          );
           onSuccess();
         } else if (latest.status === 'FAILED' || latest.status === 'CANCELLED') {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setStep('FAILED');
+          toast.error('Payment was declined or cancelled by the payment gateway', 'Deposit Failed');
         } else if (attempts >= maxAttempts) {
           if (pollingRef.current) clearInterval(pollingRef.current);
-          setError('Payment confirmation is taking longer than expected. Please check your history.');
+          const timeoutMsg = 'Payment confirmation is taking longer than expected. Please check your history.';
+          setError(timeoutMsg);
+          toast.warning(timeoutMsg, 'Polling Timeout');
           setStep('CHECKOUT');
         }
       } catch (err) {
